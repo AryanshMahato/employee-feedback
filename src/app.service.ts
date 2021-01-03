@@ -3,7 +3,7 @@ import { HealthResponse } from './app.types';
 
 @Injectable()
 export class AppService {
-  getHello(): HealthResponse {
+  getHealth(): HealthResponse {
     return {
       mongoAlive: false,
       serverAlive: true,
