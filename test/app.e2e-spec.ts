@@ -15,10 +15,15 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  describe('when health endpoint is called with no mongo connection', function () {
+    it('should respond with 500', () => {
+      return request(app.getHttpServer())
+        .get('/app/health')
+        .expect(500)
+        .expect({
+          serverAlive: true,
+          mongoAlive: false,
+        });
+    });
   });
 });

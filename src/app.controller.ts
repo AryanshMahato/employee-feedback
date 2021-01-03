@@ -1,4 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { HealthResponse } from './app.types';
 
@@ -7,7 +12,15 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('health')
+  @HttpCode(200)
   getHealth(): HealthResponse {
-    return this.appService.getHealth();
+    const health = this.appService.getHealth();
+
+    // Server and mongo is alive
+    if (health.serverAlive && health.mongoAlive) {
+      return health;
+    }
+
+    throw new InternalServerErrorException(health);
   }
 }
