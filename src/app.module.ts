@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { EnvConfig } from './config/EnvConfig';
 import { TerminusModule } from '@nestjs/terminus';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { UsersModule } from './users/users.module';
     }),
     TerminusModule,
     AuthModule,
-    UsersModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [],
