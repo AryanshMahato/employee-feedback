@@ -14,3 +14,17 @@ export class SignUpResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export type ISignInRequest = SignInRequest;
+
+export class SignInRequest {
+  email?: string;
+  username?: string;
+  type: 'email' | 'username';
+  password: string;
+}
+
+export class SignInResponse {
+  accessToken: string;
+  refreshToken: string;
+}

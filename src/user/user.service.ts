@@ -10,7 +10,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  public signUp = async (
+  signUp = async (
     userData: Omit<ISignUpRequest, 'confirmPassword'>,
   ): Promise<string> => {
     const createdUser = new this.userModel({
@@ -23,5 +23,21 @@ export class UserService {
     const user = await createdUser.save();
 
     return user.id;
+  };
+
+  getUserByEmail = async (email: string): Promise<User> => {
+    return this.userModel.findOne({
+      email,
+    });
+  };
+
+  getUserByUsername = async (username: string): Promise<User> => {
+    return this.userModel.findOne({
+      username,
+    });
+  };
+
+  getUserById = async (userId: string): Promise<User> => {
+    return this.userModel.findById(userId);
   };
 }
