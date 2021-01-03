@@ -1,26 +1,24 @@
+import { Controller, Get } from '@nestjs/common';
 import {
-  Controller,
-  Get,
-  HttpCode,
-  InternalServerErrorException,
-} from '@nestjs/common';
-import { AppService } from './app.service';
-import { HealthResponse } from './app.types';
+  HealthCheck,
+  HealthCheckResult,
+  HealthCheckService,
+  HealthIndicatorResult,
+  MongooseHealthIndicator,
+} from '@nestjs/terminus';
 
 @Controller('app')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private health: HealthCheckService,
+    private mongo: MongooseHealthIndicator,
+  ) {}
 
   @Get('health')
-  @HttpCode(200)
-  getHealth(): HealthResponse {
-    const health = this.appService.getHealth();
-
-    // Server and mongo is alive
-    if (health.serverAlive && health.mongoAlive) {
-      return health;
-    }
-
-    throw new InternalServerErrorException(health);
+  @HealthCheck()
+  getHealth(): Promise<HealthCheckResult> {
+    return this.health.check([
+      (): Promise<HealthIndicatorResult> => this.mongo.pingCheck('mongodb'),
+    ]);
   }
 }
