@@ -6,6 +6,7 @@ import { EnvConfig } from './config/EnvConfig';
 import { TerminusModule } from '@nestjs/terminus';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module';
     TerminusModule,
     AuthModule,
     UserModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [],
