@@ -8,10 +8,12 @@ import {
   Param,
   Post,
   Query,
+  Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
+  GenerateAccessTokenResponse,
   GetUserMethods,
   IGetUserResponse,
   ISignInRequest,
@@ -22,8 +24,9 @@ import {
 import { UserService } from './user.service';
 import { MongoError } from 'mongodb';
 import { AuthService } from '../auth/auth.service';
-import { User } from './user.schema';
 import { AuthGuard } from '../auth/auth.guard';
+import { Request } from 'express';
+import { AuthModule } from '../auth/auth.module';
 
 @Controller()
 export class UserController {
@@ -65,13 +68,10 @@ export class UserController {
   @Post('user/login')
   @HttpCode(200)
   async login(@Body() userData: ISignInRequest): Promise<SignInResponse> {
-    let user: User;
-    if (userData.type === 'email') {
-      user = await this.userService.getUserByEmail(userData.email);
-    }
-    if (userData.type === 'username') {
-      user = await this.userService.getUserByUsername(userData.username);
-    }
+    const user = await this.userService.getUser(
+      userData.email || userData.username,
+      userData.type,
+    );
 
     if (!user) {
       throw new NotFoundException('user not found');
@@ -102,12 +102,7 @@ export class UserController {
     @Param('userId') userId: string,
     @Query('method') method: GetUserMethods,
   ): Promise<IGetUserResponse> {
-    let user: User;
-    if (method === 'username') {
-      user = await this.userService.getUserByUsername(userId);
-    } else {
-      user = await this.userService.getUserByEmail(userId);
-    }
+    const user = await this.userService.getUser(userId, method);
 
     if (!user) {
       throw new NotFoundException('user not found');
@@ -118,6 +113,27 @@ export class UserController {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+    };
+  }
+
+  @Get('users/:userId/generate-token')
+  @UseGuards(AuthGuard)
+  async generateAccessToken(
+    @Req() req: Request,
+  ): Promise<GenerateAccessTokenResponse> {
+    const user = await this.userService.getUser(
+      req.params['userId'],
+      req.query['method'] as string,
+    );
+
+    const accessToken = await this.authService.generateAccessTokenByRefreshToken(
+      user.username,
+      user.email,
+      AuthModule.getTokenFromBearerToken(req.headers.authorization),
+    );
+
+    return {
+      accessToken,
     };
   }
 }

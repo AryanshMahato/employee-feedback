@@ -31,6 +31,10 @@ export class SignInResponse {
   refreshToken: string;
 }
 
+export interface GenerateAccessTokenResponse {
+  accessToken: string;
+}
+
 export type IUser = User;
 
 export type IGetUserResponse = Omit<IUser, 'password'>;

@@ -8,24 +8,11 @@ import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { JWTPayload } from './auth.types';
+import { AuthModule } from './auth.module';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
-
-  private static getTokenFromBearerToken(bearerToken: string): string {
-    if (!bearerToken.includes('Bearer')) {
-      throw new UnauthorizedException('token is not bearer token');
-    }
-
-    const token = bearerToken.split(' ')[1];
-
-    if (!token) {
-      throw new UnauthorizedException('invalid bearer token format');
-    }
-
-    return token;
-  }
 
   canActivate(
     context: ExecutionContext,
@@ -37,7 +24,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('bearer token not found');
     }
 
-    const token = AuthGuard.getTokenFromBearerToken(bearerToken);
+    const token = AuthModule.getTokenFromBearerToken(bearerToken);
 
     try {
       this.jwtService.verify<JWTPayload>(token);

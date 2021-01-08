@@ -25,16 +25,23 @@ export class UserService {
     return user.id;
   };
 
-  getUserByEmail = async (email: string): Promise<User> => {
+  private getUserByEmail = async (email: string): Promise<User> => {
     return this.userModel.findOne({
       email,
     });
   };
 
-  getUserByUsername = async (username: string): Promise<User> => {
+  private getUserByUsername = async (username: string): Promise<User> => {
     return this.userModel.findOne({
       username,
     });
+  };
+
+  getUser = async (userId: string, method: string): Promise<User> => {
+    if (method === 'username') {
+      return await this.getUserByUsername(userId);
+    }
+    return await this.getUserByEmail(userId);
   };
 
   getUserById = async (userId: string): Promise<User> => {

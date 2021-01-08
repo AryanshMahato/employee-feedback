@@ -19,16 +19,19 @@ export class RedisService {
   };
 
   isRefreshTokenValid = async (
-    userId: string,
-    token: string,
+    username: string,
+    refreshToken: string,
   ): Promise<void> => {
-    const tokens = await this.getRefreshTokens(userId);
-    if (!tokens.includes(token)) {
-      throw new UnauthorizedException('token is not valid');
+    const tokens = await this.getRefreshTokens(username);
+    if (!tokens.includes(refreshToken)) {
+      throw new UnauthorizedException('refresh token is not valid');
     }
   };
 
-  saveRefreshToken = async (userId: string, token: string): Promise<void> => {
-    await this.redis.lpush(userId, token);
+  saveRefreshToken = async (
+    username: string,
+    refreshToken: string,
+  ): Promise<void> => {
+    await this.redis.lpush(username, refreshToken);
   };
 }
