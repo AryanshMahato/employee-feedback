@@ -1,3 +1,5 @@
+import { User } from './user.schema';
+
 export type ISignUpRequest = SignUpRequest;
 
 export class SignUpRequest {
@@ -28,3 +30,9 @@ export class SignInResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export type IUser = User;
+
+export type IGetUserResponse = Omit<IUser, 'password'>;
+
+export type GetUserMethods = 'username' | 'email';

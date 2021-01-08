@@ -2,12 +2,17 @@ import {
   Body,
   ConflictException,
   Controller,
+  Get,
   HttpCode,
   NotFoundException,
+  Param,
   Post,
+  Query,
   UnauthorizedException,
 } from '@nestjs/common';
 import {
+  GetUserMethods,
+  IGetUserResponse,
   ISignInRequest,
   ISignUpRequest,
   SignInResponse,
@@ -18,14 +23,14 @@ import { MongoError } from 'mongodb';
 import { AuthService } from '../auth/auth.service';
 import { User } from './user.schema';
 
-@Controller('user')
+@Controller()
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
 
-  @Post('signup')
+  @Post('user/signup')
   async signUp(@Body() userData: ISignUpRequest): Promise<SignUpResponse> {
     try {
       const userId = await this.userService.signUp(userData);
@@ -53,7 +58,7 @@ export class UserController {
     }
   }
 
-  @Post('login')
+  @Post('user/login')
   @HttpCode(200)
   async login(@Body() userData: ISignInRequest): Promise<SignInResponse> {
     let user: User;
@@ -82,6 +87,30 @@ export class UserController {
     return {
       accessToken,
       refreshToken,
+    };
+  }
+
+  @Get('users/:userId')
+  async getUser(
+    @Param('userId') userId: string,
+    @Query('method') method: GetUserMethods,
+  ): Promise<IGetUserResponse> {
+    let user: User;
+    if (method === 'username') {
+      user = await this.userService.getUserByUsername(userId);
+    } else {
+      user = await this.userService.getUserByEmail(userId);
+    }
+
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+
+    return {
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
     };
   }
 }
