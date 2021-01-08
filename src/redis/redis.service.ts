@@ -33,5 +33,6 @@ export class RedisService {
     refreshToken: string,
   ): Promise<void> => {
     await this.redis.lpush(username, refreshToken);
+    await this.redis.expire(username, 60 * 60 * 24 * 30);
   };
 }
