@@ -9,6 +9,7 @@ import {
   Post,
   Query,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import {
   GetUserMethods,
@@ -22,6 +23,7 @@ import { UserService } from './user.service';
 import { MongoError } from 'mongodb';
 import { AuthService } from '../auth/auth.service';
 import { User } from './user.schema';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller()
 export class UserController {
@@ -36,9 +38,11 @@ export class UserController {
       const userId = await this.userService.signUp(userData);
       const accessToken = await this.authService.generateAccessToken(
         userData.username,
+        userData.email,
       );
       const refreshToken = await this.authService.generateRefreshToken(
         userData.username,
+        userData.email,
       );
 
       return {
@@ -79,9 +83,11 @@ export class UserController {
 
     const accessToken = await this.authService.generateAccessToken(
       userData.username,
+      userData.email,
     );
     const refreshToken = await this.authService.generateRefreshToken(
       userData.username,
+      userData.email,
     );
 
     return {
@@ -91,6 +97,7 @@ export class UserController {
   }
 
   @Get('users/:userId')
+  @UseGuards(AuthGuard)
   async getUser(
     @Param('userId') userId: string,
     @Query('method') method: GetUserMethods,
