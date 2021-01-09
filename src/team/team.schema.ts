@@ -1,7 +1,10 @@
 import * as mongoose from 'mongoose';
 
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { User } from '../user/user.schema';
+import { Document } from 'mongoose';
+
+export type TeamDocument = Team & Document;
 
 @Schema()
 export class Team {
@@ -29,3 +32,5 @@ export class Team {
   @Prop({ required: true, trim: true })
   description: string;
 }
+
+export const TeamSchema = SchemaFactory.createForClass(Team);
