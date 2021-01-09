@@ -6,7 +6,9 @@ import { Document } from 'mongoose';
 
 export type TeamDocument = Team & Document;
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Team {
   @Prop({ required: true, trim: true })
   name: string;
@@ -18,16 +20,16 @@ export class Team {
     required: true,
     trim: true,
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'users',
+    ref: User.name,
   })
-  lead: User;
+  lead: User | string;
 
   @Prop({
     required: true,
     trim: true,
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }],
   })
-  members: User[];
+  members: User[] | string[];
 
   @Prop({ required: true, trim: true })
   description: string;

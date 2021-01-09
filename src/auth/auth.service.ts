@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JWTPayload } from './auth.types';
 import { RedisService } from '../redis/redis.service';
+import { AuthModule } from './auth.module';
 
 @Injectable()
 export class AuthService {
@@ -9,6 +10,11 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
   ) {}
+
+  public getUserFromToken = (bearerToken: string): JWTPayload => {
+    const token = AuthModule.getTokenFromBearerToken(bearerToken);
+    return this.jwtService.verify<JWTPayload>(token);
+  };
 
   private signAccessToken = (
     payload: Pick<JWTPayload, 'email' | 'username'>,
