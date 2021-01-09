@@ -6,11 +6,13 @@ import { User, UserSchema } from './user.schema';
 import { AuthModule } from '../auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { EnvConfig } from '../config/EnvConfig';
+import { TeamModule } from '../team/team.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     AuthModule,
+    TeamModule,
     JwtModule.register({
       secret: EnvConfig.jwtSecret,
     }),

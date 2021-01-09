@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 import {
   GenerateAccessTokenResponse,
+  GetTeamMethods,
+  GetTeamResponse,
   GetUserMethods,
   IGetUserResponse,
   ISignInRequest,
@@ -27,12 +29,15 @@ import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { AuthModule } from '../auth/auth.module';
+import { TeamService } from '../team/team.service';
+import { TeamDocument } from '../team/team.schema';
 
 @Controller()
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly teamService: TeamService,
   ) {}
 
   @Post('user/signup')
@@ -122,5 +127,24 @@ export class UserController {
     return {
       accessToken,
     };
+  }
+
+  @Get('users/:userId/teams')
+  @UseGuards(AuthGuard)
+  async getTeam(
+    @Query('method') method: GetTeamMethods,
+    @Param('userId') userId: string,
+  ): Promise<GetTeamResponse> {
+    let teams: TeamDocument[];
+
+    if (method === 'created') {
+      teams = await this.teamService.getTeamByCreatorId(userId);
+    }
+
+    if (!teams?.length) {
+      throw new NotFoundException('team not found');
+    }
+
+    return teams;
   }
 }
