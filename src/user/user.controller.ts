@@ -39,14 +39,8 @@ export class UserController {
   async signUp(@Body() userData: ISignUpRequest): Promise<SignUpResponse> {
     try {
       const userId = await this.userService.signUp(userData);
-      const accessToken = await this.authService.generateAccessToken(
-        userData.username,
-        userData.email,
-      );
-      const refreshToken = await this.authService.generateRefreshToken(
-        userData.username,
-        userData.email,
-      );
+      const accessToken = await this.authService.generateAccessToken(userId);
+      const refreshToken = await this.authService.generateRefreshToken(userId);
 
       return {
         accessToken,
@@ -81,14 +75,8 @@ export class UserController {
       throw new UnauthorizedException();
     }
 
-    const accessToken = await this.authService.generateAccessToken(
-      userData.username,
-      userData.email,
-    );
-    const refreshToken = await this.authService.generateRefreshToken(
-      userData.username,
-      userData.email,
-    );
+    const accessToken = await this.authService.generateAccessToken(user.id);
+    const refreshToken = await this.authService.generateRefreshToken(user.id);
 
     return {
       accessToken,
@@ -127,8 +115,7 @@ export class UserController {
     );
 
     const accessToken = await this.authService.generateAccessTokenByRefreshToken(
-      user.username,
-      user.email,
+      user.id,
       AuthModule.getTokenFromBearerToken(req.headers.authorization),
     );
 

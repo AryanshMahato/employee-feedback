@@ -18,15 +18,14 @@ export class TeamController {
     @Request() req: ExpressRequest,
     @Body() body: CreateTeamRequest,
   ): Promise<CreateTeamResponse> {
-    const username = this.authService.getUserFromToken(
-      req.headers.authorization,
-    ).username;
+    const userId = this.authService.getUserFromToken(req.headers.authorization)
+      .userId;
 
     const team = await this.teamService.createTeam({
       name: body.name,
       description: body.description,
-      lead: username,
-      creator: username,
+      lead: userId,
+      creator: userId,
     });
 
     return {

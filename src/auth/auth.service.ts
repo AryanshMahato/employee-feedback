@@ -16,55 +16,40 @@ export class AuthService {
     return this.jwtService.verify<JWTPayload>(token);
   };
 
-  private signAccessToken = (
-    payload: Pick<JWTPayload, 'email' | 'username'>,
-  ): string => {
+  private signAccessToken = (userId: string): string => {
     return this.jwtService.sign(
-      { ...payload, tokenType: 'Access' },
+      { userId, tokenType: 'Access' },
       {
         expiresIn: '1h',
       },
     );
   };
 
-  private signRefreshToken = (
-    payload: Pick<JWTPayload, 'email' | 'username'>,
-  ): string => {
+  private signRefreshToken = (userId: string): string => {
     return this.jwtService.sign(
-      { ...payload, tokenType: 'Refresh' },
+      { userId, tokenType: 'Refresh' },
       {
         expiresIn: '30d',
       },
     );
   };
 
-  generateAccessToken = async (
-    username: string,
-    email: string,
-  ): Promise<string> => {
-    const payload = { username, email };
-    return this.signAccessToken(payload);
+  generateAccessToken = async (userId: string): Promise<string> => {
+    return this.signAccessToken(userId);
   };
 
-  generateRefreshToken = async (
-    username: string,
-    email: string,
-  ): Promise<string> => {
-    const payload = { username, email };
-    const token = this.signRefreshToken(payload);
-    await this.redisService.saveRefreshToken(username, token);
+  generateRefreshToken = async (userId: string): Promise<string> => {
+    const token = this.signRefreshToken(userId);
+    await this.redisService.saveRefreshToken(userId, token);
     return token;
   };
 
   generateAccessTokenByRefreshToken = async (
-    username: string,
-    email: string,
+    userId: string,
     refreshToken: string,
   ): Promise<string> => {
-    await this.redisService.isRefreshTokenValid(username, refreshToken);
+    await this.redisService.isRefreshTokenValid(userId, refreshToken);
 
-    const payload = { username, email } as JWTPayload;
-
-    return this.signAccessToken(payload);
+    return this.signAccessToken(userId);
   };
 }
