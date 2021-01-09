@@ -7,6 +7,7 @@ import { TerminusModule } from '@nestjs/terminus';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { RedisModule } from './redis/redis.module';
+import { TeamModule } from './team/team.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RedisModule } from './redis/redis.module';
     AuthModule,
     UserModule,
     RedisModule,
+    TeamModule,
   ],
   controllers: [AppController],
   providers: [],
