@@ -11,6 +11,5 @@ export class GetUserValidationQuery {
   @Matches(new RegExp(`^\\busername\\b|\\bemail\\b$`), {
     message: 'method must be username or email',
   })
-  // @IsEmail()
   method: GetUserMethods;
 }
