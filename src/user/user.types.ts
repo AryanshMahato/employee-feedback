@@ -1,16 +1,8 @@
 import { User } from './user.schema';
 import { ITeam } from '../team/team.types';
+import { SignUpRequestBody } from './user.validation';
 
-export type ISignUpRequest = SignUpRequest;
-
-export class SignUpRequest {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+export type SignUpRequest = SignUpRequestBody;
 
 export class SignUpResponse {
   id: string;

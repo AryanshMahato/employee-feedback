@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
 import { Model } from 'mongoose';
-import { ISignUpRequest } from './user.types';
+import { SignUpRequest } from './user.types';
 import { Team } from '../team/team.schema';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class UserService {
   ) {}
 
   signUp = async (
-    userData: Omit<ISignUpRequest, 'confirmPassword'>,
+    userData: Omit<SignUpRequest, 'confirmPassword'>,
   ): Promise<string> => {
     const createdUser = new this.userModel({
       firstName: userData.firstName,

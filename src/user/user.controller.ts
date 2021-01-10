@@ -16,7 +16,6 @@ import {
   GenerateAccessTokenResponse,
   IGetUserResponse,
   ISignInRequest,
-  ISignUpRequest,
   SignInResponse,
   SignUpResponse,
 } from './user.types';
@@ -29,6 +28,7 @@ import { AuthModule } from '../auth/auth.module';
 import {
   GetUserValidationParams,
   GetUserValidationQuery,
+  SignUpRequestBody,
 } from './user.validation';
 
 @Controller()
@@ -39,7 +39,7 @@ export class UserController {
   ) {}
 
   @Post('user/signup')
-  async signUp(@Body() userData: ISignUpRequest): Promise<SignUpResponse> {
+  async signUp(@Body() userData: SignUpRequestBody): Promise<SignUpResponse> {
     try {
       const userId = await this.userService.signUp(userData);
       const accessToken = await this.authService.generateAccessToken(userId);
@@ -59,6 +59,8 @@ export class UserController {
           });
         }
       }
+
+      throw e;
     }
   }
 
