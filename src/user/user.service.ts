@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
 import { Model } from 'mongoose';
 import { ISignUpRequest } from './user.types';
+import { Team } from '../team/team.schema';
 
 @Injectable()
 export class UserService {
@@ -34,9 +35,11 @@ export class UserService {
   private getUserByUsername = async (
     username: string,
   ): Promise<UserDocument> => {
-    return this.userModel.findOne({
-      username,
-    });
+    return this.userModel
+      .findOne({
+        username,
+      })
+      .populate({ path: 'ownedTeams', model: Team });
   };
 
   getUser = async (userId: string, method: string): Promise<UserDocument> => {
@@ -44,6 +47,17 @@ export class UserService {
       return await this.getUserByUsername(userId);
     }
     return await this.getUserByEmail(userId);
+  };
+
+  addTeamToOwnedTeams = async (
+    userId: string,
+    teamId: string,
+  ): Promise<void> => {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $push: {
+        ownedTeams: teamId,
+      },
+    });
   };
 
   getUserById = async (userId: string): Promise<User> => {

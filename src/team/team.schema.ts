@@ -27,7 +27,7 @@ export class Team {
   @Prop({
     required: true,
     trim: true,
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users' }],
   })
   members: User[] | string[];
 
