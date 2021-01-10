@@ -27,9 +27,11 @@ export class UserService {
   };
 
   private getUserByEmail = async (email: string): Promise<UserDocument> => {
-    return this.userModel.findOne({
-      email,
-    });
+    return this.userModel
+      .findOne({
+        email,
+      })
+      .populate({ path: 'ownedTeams', model: Team });
   };
 
   private getUserByUsername = async (
