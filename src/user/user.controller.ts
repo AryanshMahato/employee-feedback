@@ -14,9 +14,6 @@ import {
 } from '@nestjs/common';
 import {
   GenerateAccessTokenResponse,
-  GetTeamMethods,
-  GetTeamResponse,
-  GetUserMethods,
   IGetUserResponse,
   ISignInRequest,
   ISignUpRequest,
@@ -29,15 +26,16 @@ import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { AuthModule } from '../auth/auth.module';
-import { TeamService } from '../team/team.service';
-import { TeamDocument } from '../team/team.schema';
+import {
+  GetUserValidationParams,
+  GetUserValidationQuery,
+} from './user.validation';
 
 @Controller()
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
-    private readonly teamService: TeamService,
   ) {}
 
   @Post('user/signup')
@@ -92,10 +90,10 @@ export class UserController {
   @Get('users/:userId')
   @UseGuards(AuthGuard)
   async getUser(
-    @Param('userId') userId: string,
-    @Query('method') method: GetUserMethods,
+    @Param() params: GetUserValidationParams,
+    @Query() query: GetUserValidationQuery,
   ): Promise<IGetUserResponse> {
-    const user = await this.userService.getUser(userId, method);
+    const user = await this.userService.getUser(params.userId, query.method);
 
     if (!user) {
       throw new NotFoundException('user not found');
