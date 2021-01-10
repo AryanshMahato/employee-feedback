@@ -129,23 +129,4 @@ export class UserController {
       accessToken,
     };
   }
-
-  @Get('users/:userId/teams')
-  @UseGuards(AuthGuard)
-  async getTeam(
-    @Query('method') method: GetTeamMethods,
-    @Param('userId') userId: string,
-  ): Promise<GetTeamResponse> {
-    let teams: TeamDocument[];
-
-    if (method === 'created') {
-      teams = await this.teamService.getTeamByCreatorId(userId);
-    }
-
-    if (!teams?.length) {
-      throw new NotFoundException('team not found');
-    }
-
-    return teams;
-  }
 }

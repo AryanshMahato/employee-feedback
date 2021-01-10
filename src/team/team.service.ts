@@ -18,8 +18,4 @@ export class TeamService {
 
     return team;
   };
-
-  getTeamByCreatorId = async (creatorId: string): Promise<TeamDocument[]> => {
-    return this.teamModel.find({ creator: creatorId }).populate('lead');
-  };
 }

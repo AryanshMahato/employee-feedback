@@ -31,7 +31,13 @@ export class UserService {
       .findOne({
         email,
       })
-      .populate({ path: 'ownedTeams', model: Team });
+      .populate({
+        path: 'ownedTeams',
+        model: Team,
+        select: 'id name description lead createdAt updatedAt',
+      })
+      .select('firstName lastName username email')
+      .exec();
   };
 
   private getUserByUsername = async (
@@ -41,7 +47,13 @@ export class UserService {
       .findOne({
         username,
       })
-      .populate({ path: 'ownedTeams', model: Team });
+      .populate({
+        path: 'ownedTeams',
+        model: Team,
+        select: 'id name description lead createdAt updatedAt',
+      })
+      .select('firstName lastName username email')
+      .exec();
   };
 
   getUser = async (userId: string, method: string): Promise<UserDocument> => {

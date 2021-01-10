@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Request,
-  Post,
-  UseGuards,
-  Body,
-  Inject,
-  forwardRef,
-} from '@nestjs/common';
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamRequest, CreateTeamResponse } from './team.types';
 import { AuthGuard } from '../auth/auth.guard';

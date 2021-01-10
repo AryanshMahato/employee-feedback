@@ -5,7 +5,9 @@ import * as mongoose from 'mongoose';
 
 export type UserDocument = User & Document;
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class User {
   @Prop({ required: true, trim: true })
   firstName: string;

@@ -13,8 +13,13 @@ export class Team {
   @Prop({ required: true, trim: true })
   name: string;
 
-  @Prop({ required: true, trim: true })
-  creator: string;
+  @Prop({
+    required: true,
+    trim: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User.name,
+  })
+  creator: User | string;
 
   @Prop({
     required: true,
