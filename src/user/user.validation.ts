@@ -6,7 +6,8 @@ import {
   Matches,
 } from 'class-validator';
 import { GetUserMethods } from './user.types';
-import { Regex } from '../constants/Regex';
+import { NoSpecialCharacterRegex } from '../constants/Regex';
+import { Match } from '../Decorators/Valdators/match.decorator';
 
 export class GetUserValidationParams {
   @IsNotEmpty()
@@ -25,13 +26,17 @@ export class SignUpRequestBody {
   @IsNotEmpty()
   @IsString()
   @Length(2, 32)
-  @Matches(Regex.NoSpecialCharacterRegex)
+  @Matches(NoSpecialCharacterRegex, {
+    message: 'no special characters allowed in firstName',
+  })
   firstName: string;
 
   @IsNotEmpty()
   @IsString()
   @Length(2, 32)
-  @Matches(Regex.NoSpecialCharacterRegex)
+  @Matches(NoSpecialCharacterRegex, {
+    message: 'no special characters allowed in lastName',
+  })
   lastName: string;
 
   @IsNotEmpty()
@@ -53,5 +58,6 @@ export class SignUpRequestBody {
   @IsNotEmpty()
   @IsString()
   @Length(5)
+  @Match('password', { message: 'password and confirmPassword should be same' })
   confirmPassword: string;
 }

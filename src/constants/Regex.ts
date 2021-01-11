@@ -1,3 +1,1 @@
-export class Regex {
-  static NoSpecialCharacterRegex = /^[a-zA-Z0-9 ]$/;
-}
+export const NoSpecialCharacterRegex = new RegExp(/^[a-zA-Z0-9 ]*$/);
