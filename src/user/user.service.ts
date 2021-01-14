@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
 import { Model } from 'mongoose';
-import { SignUpRequest } from './user.types';
+import { GetUserOptions, SignUpRequest } from './user.types';
 import { Team } from '../team/team.schema';
+import { default as clsx } from 'clsx';
 
 @Injectable()
 export class UserService {
@@ -26,7 +27,10 @@ export class UserService {
     return user.id;
   };
 
-  private getUserByEmail = async (email: string): Promise<UserDocument> => {
+  private getUserByEmail = async (
+    email: string,
+    withPassword?: boolean,
+  ): Promise<UserDocument> => {
     return this.userModel
       .findOne({
         email,
@@ -36,12 +40,15 @@ export class UserService {
         model: Team,
         select: 'id name description lead createdAt updatedAt',
       })
-      .select('firstName lastName username email')
+      .select(
+        clsx('firstName lastName username email', { password: withPassword }),
+      )
       .exec();
   };
 
   private getUserByUsername = async (
     username: string,
+    withPassword?: boolean,
   ): Promise<UserDocument> => {
     return this.userModel
       .findOne({
@@ -52,15 +59,21 @@ export class UserService {
         model: Team,
         select: 'id name description lead createdAt updatedAt',
       })
-      .select('firstName lastName username email')
+      .select(
+        clsx('firstName lastName username email', { password: withPassword }),
+      )
       .exec();
   };
 
-  getUser = async (userId: string, method: string): Promise<UserDocument> => {
+  getUser = async (
+    userId: string,
+    method: string,
+    options?: GetUserOptions,
+  ): Promise<UserDocument> => {
     if (method === 'username') {
-      return await this.getUserByUsername(userId);
+      return await this.getUserByUsername(userId, options?.withPassword);
     }
-    return await this.getUserByEmail(userId);
+    return await this.getUserByEmail(userId, options?.withPassword);
   };
 
   addTeamToOwnedTeams = async (

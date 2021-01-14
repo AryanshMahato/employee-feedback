@@ -1,12 +1,16 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Length,
   Matches,
 } from 'class-validator';
 import { GetUserMethods } from './user.types';
-import { NoSpecialCharacterRegex } from '../constants/Regex';
+import {
+  GetUserMethodsRegex,
+  NoSpecialCharacterRegex,
+} from '../constants/Regex';
 import { Match } from '../Decorators/Valdators/match.decorator';
 
 export class GetUserValidationParams {
@@ -16,7 +20,7 @@ export class GetUserValidationParams {
 
 export class GetUserValidationQuery {
   @IsNotEmpty()
-  @Matches(new RegExp(`^\\busername\\b|\\bemail\\b$`), {
+  @Matches(GetUserMethodsRegex, {
     message: 'method must be username or email',
   })
   method: GetUserMethods;
@@ -60,4 +64,29 @@ export class SignUpRequestBody {
   @Length(5)
   @Match('password', { message: 'password and confirmPassword should be same' })
   confirmPassword: string;
+}
+
+export class SignInRequestBody {
+  @IsString()
+  @IsOptional({
+    groups: ['email'],
+  })
+  username: string;
+
+  @IsString()
+  @IsEmail()
+  @IsOptional({
+    groups: ['username'],
+  })
+  email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(5)
+  password: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Matches(GetUserMethodsRegex, { message: 'method must be username or email' })
+  type: string;
 }

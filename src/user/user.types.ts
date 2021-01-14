@@ -2,6 +2,10 @@ import { User } from './user.schema';
 import { ITeam } from '../team/team.types';
 import { SignUpRequestBody } from './user.validation';
 
+export interface GetUserOptions {
+  withPassword: boolean;
+}
+
 export type SignUpRequest = SignUpRequestBody;
 
 export class SignUpResponse {

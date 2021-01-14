@@ -10,26 +10,26 @@ import {
   Query,
   Req,
   UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
+  UseGuards
+} from "@nestjs/common";
 import {
   GenerateAccessTokenResponse,
   IGetUserResponse,
-  ISignInRequest,
   SignInResponse,
-  SignUpResponse,
-} from './user.types';
-import { UserService } from './user.service';
-import { MongoError } from 'mongodb';
-import { AuthService } from '../auth/auth.service';
-import { AuthGuard } from '../auth/auth.guard';
-import { Request } from 'express';
-import { AuthModule } from '../auth/auth.module';
+  SignUpResponse
+} from "./user.types";
+import { UserService } from "./user.service";
+import { MongoError } from "mongodb";
+import { AuthService } from "../auth/auth.service";
+import { AuthGuard } from "../auth/auth.guard";
+import { Request } from "express";
+import { AuthModule } from "../auth/auth.module";
 import {
   GetUserValidationParams,
   GetUserValidationQuery,
-  SignUpRequestBody,
-} from './user.validation';
+  SignInRequestBody,
+  SignUpRequestBody
+} from "./user.validation";
 
 @Controller()
 export class UserController {
@@ -66,10 +66,11 @@ export class UserController {
 
   @Post('user/login')
   @HttpCode(200)
-  async login(@Body() userData: ISignInRequest): Promise<SignInResponse> {
+  async login(@Body() userData: SignInRequestBody): Promise<SignInResponse> {
     const user = await this.userService.getUser(
       userData.email || userData.username,
       userData.type,
+      { withPassword: true },
     );
 
     if (!user) {
