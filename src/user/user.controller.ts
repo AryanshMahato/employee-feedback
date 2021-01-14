@@ -25,6 +25,8 @@ import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { AuthModule } from '../auth/auth.module';
 import {
+  GenerateAccessTokenRequestParams,
+  GenerateAccessTokenRequestQuery,
   GetUserValidationParams,
   GetUserValidationQuery,
   SignInRequestBody,
@@ -115,10 +117,12 @@ export class UserController {
   @UseGuards(AuthGuard)
   async generateAccessToken(
     @Req() req: Request,
+    @Param() params: GenerateAccessTokenRequestParams,
+    @Query() query: GenerateAccessTokenRequestQuery,
   ): Promise<GenerateAccessTokenResponse> {
     const user = await this.userService.getUser(
-      req.params['userId'],
-      req.query['method'] as string,
+      params['userId'],
+      query['method'] as string,
     );
 
     const accessToken = await this.authService.generateAccessTokenByRefreshToken(

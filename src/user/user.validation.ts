@@ -8,8 +8,8 @@ import {
 } from 'class-validator';
 import { GetUserMethods } from './user.types';
 import {
-  GetUserMethodsRegex,
   NoSpecialCharacterRegex,
+  UserOperationMethods,
 } from '../constants/Regex';
 import { Match } from '../Decorators/Valdators/match.decorator';
 
@@ -20,7 +20,7 @@ export class GetUserValidationParams {
 
 export class GetUserValidationQuery {
   @IsNotEmpty()
-  @Matches(GetUserMethodsRegex, {
+  @Matches(UserOperationMethods, {
     message: 'method must be username or email',
   })
   method: GetUserMethods;
@@ -87,6 +87,21 @@ export class SignInRequestBody {
 
   @IsNotEmpty()
   @IsString()
-  @Matches(GetUserMethodsRegex, { message: 'method must be username or email' })
+  @Matches(UserOperationMethods, {
+    message: 'method must be username or email',
+  })
   type: string;
+}
+
+export class GenerateAccessTokenRequestParams {
+  @IsString()
+  userId: string;
+}
+
+export class GenerateAccessTokenRequestQuery {
+  @IsString()
+  @Matches(UserOperationMethods, {
+    message: 'method must be username or email',
+  })
+  method: string;
 }
