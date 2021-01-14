@@ -10,26 +10,26 @@ import {
   Query,
   Req,
   UnauthorizedException,
-  UseGuards
-} from "@nestjs/common";
+  UseGuards,
+} from '@nestjs/common';
 import {
   GenerateAccessTokenResponse,
   IGetUserResponse,
   SignInResponse,
-  SignUpResponse
-} from "./user.types";
-import { UserService } from "./user.service";
-import { MongoError } from "mongodb";
-import { AuthService } from "../auth/auth.service";
-import { AuthGuard } from "../auth/auth.guard";
-import { Request } from "express";
-import { AuthModule } from "../auth/auth.module";
+  SignUpResponse,
+} from './user.types';
+import { UserService } from './user.service';
+import { MongoError } from 'mongodb';
+import { AuthService } from '../auth/auth.service';
+import { AuthGuard } from '../auth/auth.guard';
+import { Request } from 'express';
+import { AuthModule } from '../auth/auth.module';
 import {
   GetUserValidationParams,
   GetUserValidationQuery,
   SignInRequestBody,
-  SignUpRequestBody
-} from "./user.validation";
+  SignUpRequestBody,
+} from './user.validation';
 
 @Controller()
 export class UserController {
