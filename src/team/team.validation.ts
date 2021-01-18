@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
 import {
   GetTeamMethodsRegex,
   NoSpecialCharacterRegex,
@@ -21,7 +27,7 @@ export class CreateTeamRequestBody {
 }
 
 export class GetTeamsQuery {
-  @IsString()
+  @IsOptional()
   @Matches(GetTeamMethodsRegex, {
     message: 'invalid method',
   })

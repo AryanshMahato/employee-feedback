@@ -5,4 +5,4 @@ export const UserOperationMethods = new RegExp(`^\\busername\\b|\\bemail\\b$`);
 
 export const MongoIdValidation = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i;
 
-export const GetTeamMethodsRegex = /^\bcreated\b|\blead\b|\bmember\b$/;
+export const GetTeamMethodsRegex = /^\bcreated\b|\blead\b|\bmember\b|\b\b$/;

@@ -50,19 +50,22 @@ export class TeamController {
   @Get('teams')
   @UseGuards(AuthGuard)
   async getTeams(
-    @Req() _req: Request,
-    @Query() _query: GetTeamsQuery,
+    @Req() req: Request,
+    @Query() query: GetTeamsQuery,
   ): Promise<GetTeamResponse> {
-    // const {userId} = this.authService.getUserFromToken(req.headers.authorization);
+    const { userId } = this.authService.getUserFromToken(
+      req.headers.authorization,
+    );
 
-    return [
-      {
-        creator: 'creator',
-        lead: 'lead',
-        name: 'name',
-        members: ['name'],
-        description: 'description',
-      },
-    ];
+    switch (query.method) {
+      case 'created':
+        return this.teamService.getTeamsByCreator(userId);
+      case 'lead':
+        return this.teamService.getTeamsByLead(userId);
+      case 'member':
+        return this.teamService.getTeamsByMember(userId);
+      default:
+        return this.teamService.getTeamsByUserId(userId);
+    }
   }
 }
