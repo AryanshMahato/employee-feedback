@@ -1,9 +1,9 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamRequest, CreateTeamResponse } from './team.types';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthService } from '../auth/auth.service';
-import { Request as ExpressRequest } from 'express';
+import { Request } from 'express';
 import { UserService } from '../user/user.service';
 
 @Controller()
@@ -17,7 +17,7 @@ export class TeamController {
   @Post('team')
   @UseGuards(AuthGuard)
   async createTeam(
-    @Request() req: ExpressRequest,
+    @Req() req: Request,
     @Body() body: CreateTeamRequest,
   ): Promise<CreateTeamResponse> {
     const userId = this.authService.getUserFromToken(req.headers.authorization)

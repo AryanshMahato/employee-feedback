@@ -14,15 +14,6 @@ export class SignUpResponse {
   refreshToken: string;
 }
 
-export type ISignInRequest = SignInRequest;
-
-export class SignInRequest {
-  email?: string;
-  username?: string;
-  type: 'email' | 'username';
-  password: string;
-}
-
 export class SignInResponse {
   accessToken: string;
   refreshToken: string;
@@ -34,7 +25,7 @@ export interface GenerateAccessTokenResponse {
 
 export type IUser = User;
 
-export type IGetUserResponse = Omit<IUser, 'password'>;
+export type GetUserResponse = Omit<IUser, 'password'>;
 
 export type GetUserMethods = 'username' | 'email';
 

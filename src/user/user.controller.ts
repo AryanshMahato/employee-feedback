@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import {
   GenerateAccessTokenResponse,
-  IGetUserResponse,
+  GetUserResponse,
   SignInResponse,
   SignUpResponse,
 } from './user.types';
@@ -97,7 +97,7 @@ export class UserController {
   async getUser(
     @Param() params: GetUserValidationParams,
     @Query() query: GetUserValidationQuery,
-  ): Promise<IGetUserResponse> {
+  ): Promise<GetUserResponse> {
     const user = await this.userService.getUser(params.userId, query.method);
 
     if (!user) {
