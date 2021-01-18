@@ -6,6 +6,9 @@ import { Document } from 'mongoose';
 
 export type TeamDocument = Team & Document;
 
+export const TeamPublicSelect =
+  '_id name description lead creator members updatedAt createdAt';
+
 @Schema({
   timestamps: true,
 })

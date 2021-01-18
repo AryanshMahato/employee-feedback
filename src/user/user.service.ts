@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './user.schema';
+import { User, UserDocument, UserPublicSelect } from './user.schema';
 import { Model } from 'mongoose';
 import { GetUserOptions, SignUpRequest } from './user.types';
 import { Team } from '../team/team.schema';
@@ -40,9 +40,7 @@ export class UserService {
         model: Team,
         select: 'id name description lead createdAt updatedAt',
       })
-      .select(
-        clsx('firstName lastName username email', { password: withPassword }),
-      )
+      .select(clsx(UserPublicSelect, { password: withPassword }))
       .exec();
   };
 
@@ -59,9 +57,7 @@ export class UserService {
         model: Team,
         select: 'id name description lead createdAt updatedAt',
       })
-      .select(
-        clsx('firstName lastName username email', { password: withPassword }),
-      )
+      .select(clsx(UserPublicSelect, { password: withPassword }))
       .exec();
   };
 

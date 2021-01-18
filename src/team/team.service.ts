@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Team, TeamDocument } from './team.schema';
+import { TeamPublicSelect, Team, TeamDocument } from './team.schema';
 import { GetTeamByUserIdReturn, ITeam } from './team.types';
+import { User, UserPublicSelect } from '../user/user.schema';
 
 @Injectable()
 export class TeamService {
@@ -20,70 +21,49 @@ export class TeamService {
   };
 
   getTeamsByCreator = async (userId: string): Promise<ITeam[]> => {
-    return [
-      {
-        creator: 'creator',
-        lead: 'lead',
-        name: 'name',
-        members: ['name'],
-        description: 'description',
-      },
-    ];
+    return this.teamModel
+      .find({
+        creator: userId,
+      })
+      .select(TeamPublicSelect)
+      .populate({
+        path: 'creator lead members',
+        model: User,
+        select: UserPublicSelect,
+      });
   };
 
   getTeamsByLead = async (userId: string): Promise<ITeam[]> => {
-    return [
-      {
-        creator: 'creator',
-        lead: 'lead',
-        name: 'name',
-        members: ['name'],
-        description: 'description',
-      },
-    ];
+    return this.teamModel
+      .find({
+        lead: userId,
+      })
+      .select(TeamPublicSelect)
+      .populate({
+        path: 'creator lead members',
+        model: User,
+        select: UserPublicSelect,
+      });
   };
 
   getTeamsByMember = async (userId: string): Promise<ITeam[]> => {
-    return [
-      {
-        creator: 'creator',
-        lead: 'lead',
-        name: 'name',
-        members: ['name'],
-        description: 'description',
-      },
-    ];
+    return this.teamModel
+      .find({
+        members: userId,
+      })
+      .select(TeamPublicSelect)
+      .populate({
+        path: 'creator lead members',
+        model: User,
+        select: UserPublicSelect,
+      });
   };
 
   getTeamsByUserId = async (userId: string): Promise<GetTeamByUserIdReturn> => {
     return {
-      created: [
-        {
-          creator: 'creator',
-          lead: 'lead',
-          name: 'name',
-          members: ['name'],
-          description: 'description',
-        },
-      ],
-      lead: [
-        {
-          creator: 'creator',
-          lead: 'lead',
-          name: 'name',
-          members: ['name'],
-          description: 'description',
-        },
-      ],
-      member: [
-        {
-          creator: 'creator',
-          lead: 'lead',
-          name: 'name',
-          members: ['name'],
-          description: 'description',
-        },
-      ],
+      created: await this.getTeamsByCreator(userId),
+      lead: await this.getTeamsByLead(userId),
+      member: await this.getTeamsByMember(userId),
     };
   };
 }
