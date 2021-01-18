@@ -8,3 +8,7 @@ export interface CreateTeamResponse {
   message: string;
   id: string;
 }
+
+export type GetTeamMethods = 'created' | 'lead' | 'member';
+
+export type GetTeamResponse = ITeam[];

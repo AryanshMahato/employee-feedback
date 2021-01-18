@@ -4,3 +4,5 @@ export const NoSpecialCharacterRegex = new RegExp(/^[a-zA-Z0-9 ]*$/);
 export const UserOperationMethods = new RegExp(`^\\busername\\b|\\bemail\\b$`);
 
 export const MongoIdValidation = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i;
+
+export const GetTeamMethodsRegex = /^\bcreated\b|\blead\b|\bmember\b$/;

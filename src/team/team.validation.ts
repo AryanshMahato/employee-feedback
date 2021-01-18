@@ -1,5 +1,9 @@
 import { IsNotEmpty, IsString, Length, Matches } from 'class-validator';
-import { NoSpecialCharacterRegex } from '../constants/Regex';
+import {
+  GetTeamMethodsRegex,
+  NoSpecialCharacterRegex,
+} from '../constants/Regex';
+import { GetTeamMethods } from './team.types';
 
 export class CreateTeamRequestBody {
   @IsNotEmpty()
@@ -14,4 +18,12 @@ export class CreateTeamRequestBody {
   @IsString()
   @Length(2, 256)
   description: string;
+}
+
+export class GetTeamsQuery {
+  @IsString()
+  @Matches(GetTeamMethodsRegex, {
+    message: 'invalid method',
+  })
+  method: GetTeamMethods;
 }

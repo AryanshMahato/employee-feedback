@@ -1,11 +1,19 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { TeamService } from './team.service';
-import { CreateTeamResponse } from './team.types';
+import { CreateTeamResponse, GetTeamResponse } from './team.types';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthService } from '../auth/auth.service';
 import { Request } from 'express';
 import { UserService } from '../user/user.service';
-import { CreateTeamRequestBody } from './team.validation';
+import { CreateTeamRequestBody, GetTeamsQuery } from './team.validation';
 
 @Controller()
 export class TeamController {
@@ -37,5 +45,24 @@ export class TeamController {
       id: team.id,
       message: 'team created successfully',
     };
+  }
+
+  @Get('teams')
+  @UseGuards(AuthGuard)
+  async getTeams(
+    @Req() _req: Request,
+    @Query() _query: GetTeamsQuery,
+  ): Promise<GetTeamResponse> {
+    // const {userId} = this.authService.getUserFromToken(req.headers.authorization);
+
+    return [
+      {
+        creator: 'creator',
+        lead: 'lead',
+        name: 'name',
+        members: ['name'],
+        description: 'description',
+      },
+    ];
   }
 }
