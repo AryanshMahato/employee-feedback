@@ -90,7 +90,7 @@ export class SignInRequestBody {
   @Matches(UserOperationMethods, {
     message: 'method must be username or email',
   })
-  type: string;
+  type: 'username' | 'email';
 }
 
 export class GenerateAccessTokenRequestParams {

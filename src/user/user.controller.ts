@@ -68,7 +68,7 @@ export class UserController {
 
   @Post('user/login')
   @HttpCode(200)
-  async login(@Body() userData: SignInRequestBody): Promise<SignInResponse> {
+  async signIn(@Body() userData: SignInRequestBody): Promise<SignInResponse> {
     const user = await this.userService.getUser(
       userData.email || userData.username,
       userData.type,
@@ -79,6 +79,7 @@ export class UserController {
       throw new NotFoundException('user not found');
     }
 
+    // TODO: Add password hashing
     if (user.password != userData.password) {
       throw new UnauthorizedException();
     }
