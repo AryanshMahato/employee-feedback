@@ -8,17 +8,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { EnvConfig } from '../config/EnvConfig';
 import { UserController } from './user.controller';
 import { UserModelMock } from './user.mock';
+import { TeamModuleMock } from '../team/team.mock';
 
 describe('UsersService', () => {
   let service: UserService;
 
   beforeEach(async () => {
-    const teamModule = await Test.createTestingModule({});
-
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         AuthModule,
-        forwardRef(() => teamModule),
+        forwardRef(() => TeamModuleMock),
         JwtModule.register({
           secret: EnvConfig.jwtSecret,
         }),
