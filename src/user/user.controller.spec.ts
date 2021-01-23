@@ -5,6 +5,7 @@ import { User, UserDocument } from './user.schema';
 import {
   ConflictException,
   forwardRef,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
@@ -15,7 +16,7 @@ import { TeamModuleMock } from '../team/team.mock';
 import { AuthModuleMock } from '../auth/auth.mock';
 import { SignInRequestBody, SignUpRequestBody } from './user.validation';
 import { AuthService } from '../auth/auth.service';
-import { SignInResponse, SignUpResponse } from './user.types';
+import { GetUserResponse, SignInResponse, SignUpResponse } from './user.types';
 import { MongoError } from 'mongodb';
 
 describe('UsersController', () => {
@@ -242,6 +243,60 @@ describe('UsersController', () => {
           expect(getUserMock).toBeCalledTimes(1);
           expect(generateAccessTokenMock).toBeCalledTimes(0);
           expect(generateRefreshTokenMock).toBeCalledTimes(0);
+        }
+      });
+    });
+  });
+
+  describe('getUser()', () => {
+    const Data = {
+      ownedTeams: [],
+      email: 'test@test.com',
+      username: 'testUser',
+      lastName: 'test',
+      firstName: 'user',
+    };
+
+    describe('when getUser is called and user is found in database', () => {
+      it('should return the correct user data', async () => {
+        const mockGetUser = jest
+          .spyOn(service, 'getUser')
+          .mockImplementation(async () => {
+            return Data as UserDocument;
+          });
+
+        const getUserResponse = await controller.getUser(
+          { userId: Data.username },
+          { method: 'username' },
+        );
+
+        expect(getUserResponse).toEqual(Data);
+
+        expect(mockGetUser).toBeCalledTimes(1);
+      });
+    });
+
+    describe('when getUser is called and user is not found in database', () => {
+      it('should throw NotFoundException', async () => {
+        const mockGetUser = jest
+          .spyOn(service, 'getUser')
+          .mockImplementation(async () => {
+            return null;
+          });
+
+        let getUserResponse: GetUserResponse;
+
+        try {
+          getUserResponse = await controller.getUser(
+            { userId: Data.username },
+            { method: 'username' },
+          );
+        } catch (e) {
+          expect(getUserResponse).not.toBeDefined();
+          expect(e).toBeInstanceOf(NotFoundException);
+          expect(e?.message).toBe('user not found');
+
+          expect(mockGetUser).toBeCalledTimes(1);
         }
       });
     });

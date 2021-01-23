@@ -65,7 +65,7 @@ export class UserService {
     userId: string,
     method: string,
     options?: GetUserOptions,
-  ): Promise<UserDocument> => {
+  ): Promise<UserDocument | null | undefined> => {
     if (method === 'username') {
       return await this.getUserByUsername(userId, options?.withPassword);
     }
