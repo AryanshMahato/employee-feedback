@@ -46,35 +46,35 @@ describe('UsersController', () => {
   });
 
   describe('signUp()', () => {
-    describe('When signup is called and user is created successfully', () => {
-      const Mock = {
-        id: 'userId',
-        accessToken: 'accessToken',
-        refreshToken: 'refreshToken',
-      };
+    const Data = {
+      id: 'userId',
+      accessToken: 'accessToken',
+      refreshToken: 'refreshToken',
+    };
 
+    describe('When signup is called and user is created successfully', () => {
       it('should return mock userId', async () => {
         const signUpMock = jest
           .spyOn(service, 'signUp')
           .mockImplementation(async () => {
-            return Mock.id;
+            return Data.id;
           });
 
         const generateAccessTokenMock = jest
           .spyOn(authService, 'generateAccessToken')
           .mockImplementation(async () => {
-            return Mock.accessToken;
+            return Data.accessToken;
           });
 
         const generateRefreshTokenMock = jest
           .spyOn(authService, 'generateRefreshToken')
           .mockImplementation(async () => {
-            return Mock.refreshToken;
+            return Data.refreshToken;
           });
 
         const userId = await controller.signUp({} as SignUpRequestBody);
 
-        expect(userId).toEqual(Mock);
+        expect(userId).toEqual(Data);
 
         expect(signUpMock).toBeCalledTimes(1);
         expect(generateAccessTokenMock).toBeCalledTimes(1);
@@ -83,12 +83,6 @@ describe('UsersController', () => {
     });
 
     describe('When signup is called and user already exists in database', () => {
-      const Data = {
-        id: 'userId',
-        accessToken: 'accessToken',
-        refreshToken: 'refreshToken',
-      };
-
       it('should return mock userId', async () => {
         const signUpMock = jest
           .spyOn(service, 'signUp')
@@ -125,12 +119,6 @@ describe('UsersController', () => {
     });
 
     describe('When signup is called and there is some unknown error', () => {
-      const Data = {
-        id: 'userId',
-        accessToken: 'accessToken',
-        refreshToken: 'refreshToken',
-      };
-
       it('should return mock userId', async () => {
         const signUpMock = jest
           .spyOn(service, 'signUp')
