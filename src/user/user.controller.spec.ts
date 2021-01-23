@@ -113,6 +113,7 @@ describe('UsersController', () => {
 
         try {
           signUpResponse = await controller.signUp({} as SignUpRequestBody);
+          expect('This line not to be executed').toBeFalsy();
         } catch (e) {
           expect(signUpResponse).not.toBeDefined();
           expect(e).toBeInstanceOf(ConflictException);
@@ -149,6 +150,7 @@ describe('UsersController', () => {
 
         try {
           signUpResponse = await controller.signUp({} as SignUpRequestBody);
+          expect('This line not to be executed').toBeFalsy();
         } catch (e) {
           expect(signUpResponse).not.toBeDefined();
           expect(e).toBeInstanceOf(Error);
@@ -211,7 +213,7 @@ describe('UsersController', () => {
           .spyOn(service, 'getUser')
           .mockImplementation(async () => {
             return {
-              password: 'my password',
+              password: 'different password',
             } as UserDocument;
           });
 
@@ -236,9 +238,51 @@ describe('UsersController', () => {
             type: 'email',
             username: 'username',
           } as SignInRequestBody);
+          expect('This line not to be executed').toBeFalsy();
         } catch (e) {
           expect(signInResponse).not.toBeDefined();
           expect(e).toBeInstanceOf(UnauthorizedException);
+
+          expect(getUserMock).toBeCalledTimes(1);
+          expect(generateAccessTokenMock).toBeCalledTimes(0);
+          expect(generateRefreshTokenMock).toBeCalledTimes(0);
+        }
+      });
+    });
+
+    describe('When signIn is called but user is not found', () => {
+      it('should throw NotFoundException', async () => {
+        const getUserMock = jest
+          .spyOn(service, 'getUser')
+          .mockImplementation(async () => {
+            return null;
+          });
+
+        const generateAccessTokenMock = jest
+          .spyOn(authService, 'generateAccessToken')
+          .mockImplementation(async () => {
+            return Data.accessToken;
+          });
+
+        const generateRefreshTokenMock = jest
+          .spyOn(authService, 'generateRefreshToken')
+          .mockImplementation(async () => {
+            return Data.refreshToken;
+          });
+
+        let signInResponse: SignInResponse;
+
+        try {
+          signInResponse = await controller.signIn({
+            email: 'test@test.com',
+            password: 'my password',
+            type: 'email',
+            username: 'username',
+          } as SignInRequestBody);
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(signInResponse).not.toBeDefined();
+          expect(e).toBeInstanceOf(NotFoundException);
 
           expect(getUserMock).toBeCalledTimes(1);
           expect(generateAccessTokenMock).toBeCalledTimes(0);
@@ -291,6 +335,7 @@ describe('UsersController', () => {
             { userId: Data.username },
             { method: 'username' },
           );
+          expect('This line not to be executed').toBeFalsy();
         } catch (e) {
           expect(getUserResponse).not.toBeDefined();
           expect(e).toBeInstanceOf(NotFoundException);
