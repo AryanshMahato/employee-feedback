@@ -1,7 +1,11 @@
 import { Test } from '@nestjs/testing';
 import { UserService } from './user.service';
 
-export class UserModelMock {}
+export class UserModelMock {
+  create = async (): Promise<unknown> => {
+    return;
+  };
+}
 
 export class UserServiceMock {}
 

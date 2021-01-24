@@ -12,19 +12,20 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
+  // creates user in table and returns userId of created user
   signUp = async (
     userData: Omit<SignUpRequest, 'confirmPassword'>,
   ): Promise<string> => {
-    const createdUser = new this.userModel({
+    const createdUser = await this.userModel.create({
       firstName: userData.firstName,
       lastName: userData.lastName,
       username: userData.username,
       email: userData.email,
       password: userData.password,
-    } as User);
-    const user = await createdUser.save();
+      ownedTeams: [],
+    });
 
-    return user.id;
+    return createdUser.id;
   };
 
   private getUserByEmail = async (

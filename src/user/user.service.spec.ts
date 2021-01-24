@@ -12,6 +12,7 @@ import { TeamModuleMock } from '../team/team.mock';
 
 describe('UsersService', () => {
   let service: UserService;
+  const userModel = new UserModelMock();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,7 +25,7 @@ describe('UsersService', () => {
       ],
       providers: [
         UserService,
-        { provide: getModelToken(User.name), useClass: UserModelMock },
+        { provide: getModelToken(User.name), useValue: userModel },
       ],
       controllers: [UserController],
       exports: [UserService],
@@ -35,5 +36,54 @@ describe('UsersService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('signUp()', () => {
+    const Data = {
+      userId: 'userId',
+      email: 'test@test.com',
+      firstName: 'test',
+      lastName: 'user',
+      password: 'test123',
+      username: 'test',
+    };
+
+    describe('when signup is called and database operation is successful', () => {
+      it('should return correct userId', async () => {
+        const mockUserModel = jest
+          .spyOn(userModel, 'create')
+          .mockImplementation(async () => {
+            return { id: Data.userId };
+          });
+
+        const userId = await service.signUp(Data);
+
+        expect(userId).toBe(Data.userId);
+        expect(mockUserModel).toBeCalledTimes(1);
+      });
+    });
+
+    describe('when signup is called and database operation is failed', () => {
+      it('should throw same error', async () => {
+        const mockUserCreate = jest
+          .spyOn(userModel, 'create')
+          .mockImplementation(async () => {
+            throw new Error('unknown error');
+          });
+
+        let userId: string;
+
+        try {
+          userId = await service.signUp(Data);
+          expect('This line no to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).toBeInstanceOf(Error);
+          expect(e?.message).toBe('unknown error');
+
+          expect(userId).not.toBeDefined();
+          expect(mockUserCreate).toBeCalledTimes(1);
+        }
+      });
+    });
   });
 });
