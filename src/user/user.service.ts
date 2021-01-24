@@ -64,7 +64,7 @@ export class UserService {
 
   getUser = async (
     userId: string,
-    method: string,
+    method: 'username' | 'email',
     options?: GetUserOptions,
   ): Promise<UserDocument | null | undefined> => {
     if (method === 'username') {
@@ -82,9 +82,5 @@ export class UserService {
         ownedTeams: teamId,
       },
     });
-  };
-
-  getUserById = async (userId: string): Promise<User> => {
-    return this.userModel.findById(userId);
   };
 }

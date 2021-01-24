@@ -5,6 +5,10 @@ export class UserModelMock {
   create = async (): Promise<unknown> => {
     return;
   };
+
+  findOne = (): unknown => {
+    return;
+  };
 }
 
 export class UserServiceMock {}

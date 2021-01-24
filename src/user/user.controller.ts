@@ -123,7 +123,7 @@ export class UserController {
   ): Promise<GenerateAccessTokenResponse> {
     const user = await this.userService.getUser(
       params['userId'],
-      query['method'] as string,
+      query['method'] as 'username' | 'email',
     );
 
     if (!user) {

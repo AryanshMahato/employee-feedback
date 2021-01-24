@@ -9,6 +9,9 @@ import { EnvConfig } from '../config/EnvConfig';
 import { UserController } from './user.controller';
 import { UserModelMock } from './user.mock';
 import { TeamModuleMock } from '../team/team.mock';
+import clearAllMocks = jest.clearAllMocks;
+
+beforeEach(clearAllMocks);
 
 describe('UsersService', () => {
   let service: UserService;
@@ -83,6 +86,63 @@ describe('UsersService', () => {
           expect(userId).not.toBeDefined();
           expect(mockUserCreate).toBeCalledTimes(1);
         }
+      });
+    });
+  });
+
+  describe('getUser()', () => {
+    const Data = {
+      id: 'id',
+      name: 'test',
+    };
+
+    describe('when database is called with and user is found by username', () => {
+      it('should return correct name', async () => {
+        const mockUserFindOne = jest
+          .spyOn(userModel, 'findOne')
+          .mockImplementation(() => {
+            return {
+              populate: (): unknown => ({
+                select: (): unknown => ({
+                  exec: (): unknown => ({
+                    id: Data.id,
+                    name: Data.name,
+                  }),
+                }),
+              }),
+            };
+          });
+
+        const user = await service.getUser(Data.id, 'username');
+
+        expect(user).toEqual(Data);
+
+        expect(mockUserFindOne).toBeCalledTimes(1);
+      });
+    });
+
+    describe('when database is called with and user is found by email', () => {
+      it('should return correct name', async () => {
+        const mockUserFindOne = jest
+          .spyOn(userModel, 'findOne')
+          .mockImplementation(() => {
+            return {
+              populate: (): unknown => ({
+                select: (): unknown => ({
+                  exec: (): unknown => ({
+                    id: Data.id,
+                    name: Data.name,
+                  }),
+                }),
+              }),
+            };
+          });
+
+        const user = await service.getUser(Data.id, 'email');
+
+        expect(user).toEqual(Data);
+
+        expect(mockUserFindOne).toBeCalledTimes(1);
       });
     });
   });
