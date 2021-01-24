@@ -16,8 +16,14 @@ import { TeamModuleMock } from '../team/team.mock';
 import { AuthModuleMock } from '../auth/auth.mock';
 import { SignInRequestBody, SignUpRequestBody } from './user.validation';
 import { AuthService } from '../auth/auth.service';
-import { GetUserResponse, SignInResponse, SignUpResponse } from './user.types';
+import {
+  GenerateAccessTokenResponse,
+  GetUserResponse,
+  SignInResponse,
+  SignUpResponse,
+} from './user.types';
 import { MongoError } from 'mongodb';
+import { Request } from 'express';
 
 describe('UsersController', () => {
   let controller: UserController;
@@ -342,6 +348,83 @@ describe('UsersController', () => {
           expect(e?.message).toBe('user not found');
 
           expect(mockGetUser).toBeCalledTimes(1);
+        }
+      });
+    });
+  });
+
+  describe('generateAccessToken()', () => {
+    const Data = {
+      accessToken: 'accessToken',
+      ownedTeams: [],
+      email: 'test@test.com',
+      username: 'testUser',
+      lastName: 'test',
+      firstName: 'user',
+    };
+
+    describe('when generateAccessToken is called and user is found in database and token is generated successfully', () => {
+      it('should return generated access token', async () => {
+        const mockGetUser = jest
+          .spyOn(service, 'getUser')
+          .mockImplementation(async () => {
+            return ({
+              ...Data,
+              accessToken: undefined,
+            } as unknown) as UserDocument;
+          });
+
+        const mockGenerateAccessTokenByRefreshToken = jest
+          .spyOn(authService, 'generateAccessTokenByRefreshToken')
+          .mockImplementation(async () => {
+            return Data.accessToken;
+          });
+
+        const generateAccessTokenResponse = await controller.generateAccessToken(
+          { headers: { authorization: 'Bearer token' } } as Request,
+          { userId: Data.username },
+          { method: 'username' },
+        );
+
+        expect(generateAccessTokenResponse).toEqual({
+          accessToken: Data.accessToken,
+        });
+
+        expect(mockGetUser).toBeCalledTimes(1);
+        expect(mockGenerateAccessTokenByRefreshToken).toBeCalledTimes(1);
+      });
+    });
+
+    describe('when generateAccessToken is called and user is not found in database', () => {
+      it('should throw NotFoundException', async () => {
+        const mockGetUser = jest
+          .spyOn(service, 'getUser')
+          .mockImplementation(async () => {
+            return null;
+          });
+
+        const mockGenerateAccessTokenByRefreshToken = jest
+          .spyOn(authService, 'generateAccessTokenByRefreshToken')
+          .mockImplementation(async () => {
+            return Data.accessToken;
+          });
+
+        let generateAccessTokenResponse: GenerateAccessTokenResponse;
+
+        try {
+          generateAccessTokenResponse = await controller.generateAccessToken(
+            { headers: { authorization: 'Bearer token' } } as Request,
+            { userId: Data.username },
+            { method: 'username' },
+          );
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(generateAccessTokenResponse).not.toBeDefined();
+          expect(e).toBeInstanceOf(NotFoundException);
+          expect(e?.message).toBe('user not found');
+
+          expect(mockGetUser).toBeCalledTimes(1);
+          expect(mockGenerateAccessTokenByRefreshToken).toBeCalledTimes(0);
         }
       });
     });

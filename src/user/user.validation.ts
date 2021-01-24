@@ -103,5 +103,5 @@ export class GenerateAccessTokenRequestQuery {
   @Matches(UserOperationMethods, {
     message: 'method must be username or email',
   })
-  method: string;
+  method: 'username' | 'email';
 }

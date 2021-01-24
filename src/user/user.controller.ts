@@ -126,6 +126,10 @@ export class UserController {
       query['method'] as string,
     );
 
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+
     const accessToken = await this.authService.generateAccessTokenByRefreshToken(
       user.id,
       AuthModule.getTokenFromBearerToken(req.headers.authorization),
