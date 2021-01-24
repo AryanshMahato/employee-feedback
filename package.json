@@ -85,7 +85,9 @@
       "**/*.(t|j)s",
       "!**/*.mock.*",
       "!**/*.types.*",
-      "!**/*.module.*"
+      "!**/*.module.*",
+      "!**/config/**",
+      "!**/main.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
