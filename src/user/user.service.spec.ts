@@ -146,4 +146,44 @@ describe('UsersService', () => {
       });
     });
   });
+
+  describe('addToOwnedTeams', () => {
+    const Data = {
+      userId: 'userId',
+      teamId: 'teamId',
+    };
+
+    describe('When teamId is added to owned teams', () => {
+      it('should not throw any error', async () => {
+        const mockUserFindByIdAndUpdate = jest
+          .spyOn(userModel, 'findByIdAndUpdate')
+          .mockImplementation(() => {
+            return;
+          });
+
+        await service.addTeamToOwnedTeams(Data.userId, Data.teamId);
+
+        expect(mockUserFindByIdAndUpdate).toBeCalledTimes(1);
+      });
+    });
+
+    describe('When teamId is failed to add in owned teams', () => {
+      it('should not throw error', async () => {
+        const mockUserFindByIdAndUpdate = jest
+          .spyOn(userModel, 'findByIdAndUpdate')
+          .mockImplementation(() => {
+            throw new Error();
+          });
+
+        try {
+          await service.addTeamToOwnedTeams(Data.userId, Data.teamId);
+          expect('this line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).toBeInstanceOf(Error);
+
+          expect(mockUserFindByIdAndUpdate).toBeCalledTimes(1);
+        }
+      });
+    });
+  });
 });
