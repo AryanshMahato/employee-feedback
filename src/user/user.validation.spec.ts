@@ -1,5 +1,6 @@
 import {
   GenerateAccessTokenRequestParams,
+  GenerateAccessTokenRequestQuery,
   GetUserValidationParams,
   GetUserValidationQuery,
   SignInRequestBody,
@@ -501,6 +502,47 @@ describe('GenerateAccessTokenRequestParams', () => {
         generateAccessTokenRequestParams.userId = '';
 
         await validateOrReject(generateAccessTokenRequestParams);
+        expect('There should be an error').toBeFalsy();
+      } catch (e) {
+        expect(e).toBeInstanceOf(Array);
+
+        if (Array.isArray(e)) {
+          e.forEach((e) => {
+            expect(e).toBeInstanceOf(ValidationError);
+          });
+        }
+      }
+    });
+  });
+});
+
+describe('GenerateAccessTokenRequestQuery', () => {
+  describe('When valid method is passed', () => {
+    it('should not throw any error', async () => {
+      const generateAccessTokenRequestQuery = new GenerateAccessTokenRequestQuery();
+      generateAccessTokenRequestQuery.method = 'username';
+
+      await validateOrReject(generateAccessTokenRequestQuery);
+      expect.anything();
+    });
+
+    it('should not throw any error', async () => {
+      const generateAccessTokenRequestQuery = new GenerateAccessTokenRequestQuery();
+      generateAccessTokenRequestQuery.method = 'email';
+
+      await validateOrReject(generateAccessTokenRequestQuery);
+      expect.anything();
+    });
+  });
+
+  describe('When empty method is passed', () => {
+    it('should not throw any error', async () => {
+      try {
+        const generateAccessTokenRequestQuery = new GenerateAccessTokenRequestQuery();
+        // @ts-ignore
+        generateAccessTokenRequestQuery.method = '';
+
+        await validateOrReject(generateAccessTokenRequestQuery);
         expect('There should be an error').toBeFalsy();
       } catch (e) {
         expect(e).toBeInstanceOf(Array);
