@@ -1,6 +1,7 @@
 import {
   GetUserValidationParams,
   GetUserValidationQuery,
+  SignInRequestBody,
   SignUpRequestBody,
 } from './user.validation';
 import { validateOrReject, ValidationError } from 'class-validator';
@@ -295,6 +296,178 @@ describe('SignUpRequestBody', () => {
         const signUpRequestBody = new SignUpRequestBody();
 
         await validateOrReject(signUpRequestBody);
+        expect('There should be an error').toBeFalsy();
+      } catch (e) {
+        expect(e).toBeInstanceOf(Array);
+
+        if (Array.isArray(e)) {
+          e.forEach((e) => {
+            expect(e).toBeInstanceOf(ValidationError);
+          });
+        }
+      }
+    });
+  });
+});
+
+describe('SignInRequestBody', () => {
+  describe('When all valid fields are passed', () => {
+    it('should not throw any error', async () => {
+      const signInRequestBody = new SignInRequestBody();
+      signInRequestBody.username = 'CaptainAmerica';
+      signInRequestBody.email = 'steve@avengers.com';
+      signInRequestBody.password = 'I can do this all day';
+      signInRequestBody.type = 'username';
+
+      await validateOrReject(signInRequestBody);
+      expect.anything();
+    });
+  });
+
+  describe('When one of username or email is missing', () => {
+    it('should not throw any error', async () => {
+      const signInRequestBody = new SignInRequestBody();
+      signInRequestBody.username = 'CaptainAmerica';
+      signInRequestBody.password = 'I can do this all day';
+      signInRequestBody.type = 'username';
+
+      await validateOrReject(signInRequestBody);
+      expect.anything();
+    });
+
+    it('should not throw any error', async () => {
+      const signInRequestBody = new SignInRequestBody();
+      signInRequestBody.email = 'steve@avengers.com';
+      signInRequestBody.password = 'I can do this all day';
+      signInRequestBody.type = 'email';
+
+      await validateOrReject(signInRequestBody);
+      expect.anything();
+    });
+  });
+
+  describe('When invalid username is passed', () => {
+    it('should throw validation error', async () => {
+      try {
+        const signInRequestBody = new SignInRequestBody();
+        signInRequestBody.username = 'Captain America';
+        signInRequestBody.email = 'steve@avengers.com';
+        signInRequestBody.password = 'I can do this all day';
+        signInRequestBody.type = 'username';
+
+        await validateOrReject(signInRequestBody);
+        expect('There should be an error').toBeFalsy();
+      } catch (e) {
+        expect(e).toBeInstanceOf(Array);
+
+        if (Array.isArray(e)) {
+          e.forEach((e) => {
+            expect(e).toBeInstanceOf(ValidationError);
+          });
+        }
+      }
+    });
+  });
+
+  describe('When invalid email is passed', () => {
+    it('should throw validation error', async () => {
+      try {
+        const signInRequestBody = new SignInRequestBody();
+        signInRequestBody.username = 'CaptainAmerica';
+        signInRequestBody.email = 'steveAvengers.com';
+        signInRequestBody.password = 'I can do this all day';
+        signInRequestBody.type = 'username';
+
+        await validateOrReject(signInRequestBody);
+        expect('There should be an error').toBeFalsy();
+      } catch (e) {
+        expect(e).toBeInstanceOf(Array);
+
+        if (Array.isArray(e)) {
+          e.forEach((e) => {
+            expect(e).toBeInstanceOf(ValidationError);
+          });
+        }
+      }
+    });
+  });
+
+  describe('When small password is passed', () => {
+    it('should throw validation error', async () => {
+      try {
+        const signInRequestBody = new SignInRequestBody();
+        signInRequestBody.username = 'CaptainAmerica';
+        signInRequestBody.email = 'steve@avengers.com';
+        signInRequestBody.password = 'ca';
+        signInRequestBody.type = 'username';
+
+        await validateOrReject(signInRequestBody);
+        expect('There should be an error').toBeFalsy();
+      } catch (e) {
+        expect(e).toBeInstanceOf(Array);
+
+        if (Array.isArray(e)) {
+          e.forEach((e) => {
+            expect(e).toBeInstanceOf(ValidationError);
+          });
+        }
+      }
+    });
+  });
+  describe('When invalid is passed', () => {
+    it('should throw validation error', async () => {
+      try {
+        const signInRequestBody = new SignInRequestBody();
+        signInRequestBody.username = 'CaptainAmerica';
+        signInRequestBody.email = 'steve@avengers.com';
+        signInRequestBody.password = 'I can do this all day';
+        // @ts-ignore
+        signInRequestBody.type = 'invalid';
+
+        await validateOrReject(signInRequestBody);
+        expect('There should be an error').toBeFalsy();
+      } catch (e) {
+        expect(e).toBeInstanceOf(Array);
+
+        if (Array.isArray(e)) {
+          e.forEach((e) => {
+            expect(e).toBeInstanceOf(ValidationError);
+          });
+        }
+      }
+    });
+  });
+
+  describe('When all empty string is passed', () => {
+    it('should throw validation error', async () => {
+      try {
+        const signInRequestBody = new SignInRequestBody();
+        signInRequestBody.username = '';
+        signInRequestBody.email = '';
+        signInRequestBody.password = '';
+        // @ts-ignore
+        signInRequestBody.type = '';
+
+        await validateOrReject(signInRequestBody);
+        expect('There should be an error').toBeFalsy();
+      } catch (e) {
+        expect(e).toBeInstanceOf(Array);
+
+        if (Array.isArray(e)) {
+          e.forEach((e) => {
+            expect(e).toBeInstanceOf(ValidationError);
+          });
+        }
+      }
+    });
+  });
+
+  describe('When nothing is passed', () => {
+    it('should throw validation error', async () => {
+      try {
+        const signInRequestBody = new SignInRequestBody();
+
+        await validateOrReject(signInRequestBody);
         expect('There should be an error').toBeFalsy();
       } catch (e) {
         expect(e).toBeInstanceOf(Array);

@@ -75,6 +75,9 @@ export class SignInRequestBody {
   @IsOptional({
     groups: ['email'],
   })
+  @Matches(NoSpaceAndSpecialCharacterRegex, {
+    message: 'no special characters or space allowed in username',
+  })
   username: string;
 
   @IsString()
