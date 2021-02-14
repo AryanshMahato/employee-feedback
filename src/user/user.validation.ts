@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { GetUserMethods } from './user.types';
 import {
+  NoSpaceAndSpecialCharacterRegex,
   NoSpecialCharacterRegex,
   UserOperationMethods,
 } from '../constants/Regex';
@@ -46,6 +47,9 @@ export class SignUpRequestBody {
   @IsNotEmpty()
   @IsString()
   @Length(2, 32)
+  @Matches(NoSpaceAndSpecialCharacterRegex, {
+    message: 'no special characters or space allowed in username',
+  })
   username: string;
 
   @IsNotEmpty()
