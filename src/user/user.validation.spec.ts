@@ -1,4 +1,5 @@
 import {
+  GenerateAccessTokenRequestParams,
   GetUserValidationParams,
   GetUserValidationQuery,
   SignInRequestBody,
@@ -468,6 +469,38 @@ describe('SignInRequestBody', () => {
         const signInRequestBody = new SignInRequestBody();
 
         await validateOrReject(signInRequestBody);
+        expect('There should be an error').toBeFalsy();
+      } catch (e) {
+        expect(e).toBeInstanceOf(Array);
+
+        if (Array.isArray(e)) {
+          e.forEach((e) => {
+            expect(e).toBeInstanceOf(ValidationError);
+          });
+        }
+      }
+    });
+  });
+});
+
+describe('GenerateAccessTokenRequestParams', () => {
+  describe('When userId is passed', () => {
+    it('should not throw any error', async () => {
+      const generateAccessTokenRequestParams = new GenerateAccessTokenRequestParams();
+      generateAccessTokenRequestParams.userId = 'captain';
+
+      await validateOrReject(generateAccessTokenRequestParams);
+      expect.anything();
+    });
+  });
+
+  describe('When empty userId is passed', () => {
+    it('should not throw any error', async () => {
+      try {
+        const generateAccessTokenRequestParams = new GenerateAccessTokenRequestParams();
+        generateAccessTokenRequestParams.userId = '';
+
+        await validateOrReject(generateAccessTokenRequestParams);
         expect('There should be an error').toBeFalsy();
       } catch (e) {
         expect(e).toBeInstanceOf(Array);

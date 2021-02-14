@@ -1,4 +1,5 @@
 import {
+  IsDefined,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -102,6 +103,8 @@ export class SignInRequestBody {
 
 export class GenerateAccessTokenRequestParams {
   @IsString()
+  @IsNotEmpty()
+  @IsDefined()
   userId: string;
 }
 
