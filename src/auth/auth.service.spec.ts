@@ -55,4 +55,19 @@ describe('AuthService', () => {
       });
     });
   });
+
+  describe('generateAccessToken()', () => {
+    describe('When userId is passed', () => {
+      it('should return signed access token', async () => {
+        const mockJwtService = jest
+          .spyOn(jwtService, 'sign')
+          .mockImplementation(() => 'signed-token');
+
+        const accessToken = await service.generateAccessToken('userId');
+
+        expect(accessToken).toBe('signed-token');
+        expect(mockJwtService).toBeCalledTimes(1);
+      });
+    });
+  });
 });
