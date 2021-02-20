@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { EnvConfig } from '../config/EnvConfig';
 import { RedisModule } from '../redis/redis.module';
 import { AuthService } from './auth.service';
+import { Request } from 'express';
 
 export const AuthModuleMock = Test.createTestingModule({
   imports: [
@@ -18,3 +19,19 @@ export const AuthModuleMock = Test.createTestingModule({
   providers: [AuthService],
   exports: [AuthService],
 });
+
+export class MockAuthExecutionContext {
+  getRequest(): Request {
+    return {
+      headers: {
+        authorization: '',
+      },
+    } as Request;
+  }
+
+  switchToHttp(): { getRequest } {
+    return {
+      getRequest: this.getRequest,
+    };
+  }
+}
