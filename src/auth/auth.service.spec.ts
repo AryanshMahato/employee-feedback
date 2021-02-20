@@ -7,6 +7,7 @@ import { EnvConfig } from '../config/EnvConfig';
 import { RedisModule } from '../redis/redis.module';
 import { JWTPayload } from './auth.types';
 import { RedisService } from '../redis/redis.service';
+import { UnauthorizedException } from '@nestjs/common';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -81,14 +82,66 @@ describe('AuthService', () => {
           .spyOn(jwtService, 'sign')
           .mockImplementation(() => 'signed-token');
 
-        jest.spyOn(redisService, 'saveRefreshToken').mockImplementation(() => {
-          return new Promise((res) => res());
-        });
+        const mockRedisService = jest
+          .spyOn(redisService, 'saveRefreshToken')
+          .mockImplementation(() => {
+            return new Promise((res) => res());
+          });
 
-        const accessToken = await service.generateAccessToken('userId');
+        const accessToken = await service.generateRefreshToken('userId');
 
         expect(accessToken).toBe('signed-token');
         expect(mockJwtService).toBeCalledTimes(1);
+        expect(mockRedisService).toBeCalledTimes(1);
+      });
+    });
+  });
+
+  describe('generateAccessTokenByRefreshToken()', () => {
+    describe('When refresh token is valid', () => {
+      it('should return signed access token', async () => {
+        const mockJwtService = jest
+          .spyOn(jwtService, 'sign')
+          .mockImplementation(() => 'signed-token');
+
+        const mockRedisService = jest
+          .spyOn(redisService, 'isRefreshTokenValid')
+          .mockImplementation(() => {
+            return new Promise((res) => res());
+          });
+
+        const accessToken = await service.generateAccessTokenByRefreshToken(
+          'userId',
+          'refreshToken',
+        );
+
+        expect(accessToken).toBe('signed-token');
+        expect(mockJwtService).toBeCalledTimes(1);
+        expect(mockRedisService).toBeCalledTimes(1);
+      });
+    });
+
+    describe('When refresh token is invalid', () => {
+      it('should throw error', async () => {
+        jest.spyOn(jwtService, 'sign').mockImplementation(() => 'signed-token');
+
+        jest
+          .spyOn(redisService, 'isRefreshTokenValid')
+          .mockImplementation(() => {
+            throw new UnauthorizedException('refresh token is not valid');
+          });
+
+        try {
+          await service.generateAccessTokenByRefreshToken(
+            'userId',
+            'refreshToken',
+          );
+
+          expect('this line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).toBeInstanceOf(UnauthorizedException);
+          expect(e?.message).toBe('refresh token is not valid');
+        }
       });
     });
   });
