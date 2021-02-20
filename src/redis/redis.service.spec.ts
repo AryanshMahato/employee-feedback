@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RedisService } from './redis.service';
 import { MockRedis } from './redis.mock';
-import { UnauthorizedException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 describe('RedisService', () => {
   let service: RedisService;
@@ -65,6 +68,40 @@ describe('RedisService', () => {
         } catch (e) {
           expect(e).toBeInstanceOf(UnauthorizedException);
           expect(e?.message).toBe('refresh token is not valid');
+        }
+      });
+    });
+  });
+
+  describe('saveRefreshToken()', () => {
+    describe('When refresh token is successfully stored in db', () => {
+      it('should not throw any error', async () => {
+        const mockRedis = new MockRedis();
+        // @ts-ignore
+        service.redis = mockRedis;
+        jest.spyOn(mockRedis, 'lpush').mockImplementation(() => {});
+        jest.spyOn(mockRedis, 'expire').mockImplementation(() => {});
+
+        await service.saveRefreshToken('userId', 'mock refresh token');
+      });
+    });
+
+    describe('When refresh token is failed to store in db', () => {
+      it('should throw InternalServerErrorException', async () => {
+        const mockRedis = new MockRedis();
+        // @ts-ignore
+        service.redis = mockRedis;
+        jest.spyOn(mockRedis, 'lpush').mockImplementation(() => {
+          throw new InternalServerErrorException('unknown');
+        });
+        jest.spyOn(mockRedis, 'expire').mockImplementation(() => {});
+
+        try {
+          await service.saveRefreshToken('userId', 'mock refresh token');
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).toBeInstanceOf(InternalServerErrorException);
+          expect(e?.message).toBe('unknown');
         }
       });
     });
