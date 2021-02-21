@@ -39,6 +39,7 @@ export class TeamController {
       creator: userId,
     });
 
+    // Todo: Add delete team if this fails
     await this.userService.addTeamToOwnedTeams(userId, team.id);
 
     return {
