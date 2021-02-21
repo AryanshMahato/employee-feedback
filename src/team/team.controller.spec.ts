@@ -77,15 +77,15 @@ describe('TeamController', () => {
 
         const requestBodyMock = {} as CreateTeamRequestBody;
 
-        const mockService = jest
+        jest
           .spyOn(service, 'createTeam')
           .mockImplementation(async () => mockTeam);
 
-        const mockAuthService = jest
+        jest
           .spyOn(authService, 'getUserFromToken')
           .mockImplementation(() => mockJwtPayload);
 
-        const mockUserService = jest
+        jest
           .spyOn(userService, 'addTeamToOwnedTeams')
           .mockImplementation(async () => {});
 
@@ -99,9 +99,9 @@ describe('TeamController', () => {
           message: 'team created successfully',
         });
 
-        expect(mockAuthService).toBeCalledTimes(1);
-        expect(mockService).toBeCalledTimes(1);
-        expect(mockUserService).toBeCalledTimes(1);
+        expect(authService.getUserFromToken).toBeCalledTimes(1);
+        expect(service.createTeam).toBeCalledTimes(1);
+        expect(userService.addTeamToOwnedTeams).toBeCalledTimes(1);
       });
     });
 
@@ -221,15 +221,13 @@ describe('TeamController', () => {
 
         const mockResponse = { created: [], lead: [], member: [] };
 
-        const mockAuthService = jest
+        jest
           .spyOn(authService, 'getUserFromToken')
           .mockImplementation(() => mockJwtPayload);
 
-        const mockService = jest
-          .spyOn(service, 'getTeamsByUserId')
-          .mockImplementation(async () => {
-            return mockResponse;
-          });
+        jest.spyOn(service, 'getTeamsByUserId').mockImplementation(async () => {
+          return mockResponse;
+        });
 
         const response = await controller.getTeams(
           requestMock,
@@ -238,8 +236,8 @@ describe('TeamController', () => {
 
         expect(response).toEqual(mockResponse);
 
-        expect(mockAuthService).toBeCalledTimes(1);
-        expect(mockService).toBeCalledTimes(1);
+        expect(authService.getUserFromToken).toBeCalledTimes(1);
+        expect(service.getTeamsByUserId).toBeCalledTimes(1);
       });
     });
 
@@ -257,11 +255,11 @@ describe('TeamController', () => {
 
         const mockResponse = [];
 
-        const mockAuthService = jest
+        jest
           .spyOn(authService, 'getUserFromToken')
           .mockImplementation(() => mockJwtPayload);
 
-        const mockService = jest
+        jest
           .spyOn(service, 'getTeamsByCreator')
           .mockImplementation(async () => {
             return mockResponse;
@@ -274,8 +272,8 @@ describe('TeamController', () => {
 
         expect(response).toEqual(mockResponse);
 
-        expect(mockAuthService).toBeCalledTimes(1);
-        expect(mockService).toBeCalledTimes(1);
+        expect(authService.getUserFromToken).toBeCalledTimes(1);
+        expect(service.getTeamsByCreator).toBeCalledTimes(1);
       });
     });
 
@@ -293,15 +291,13 @@ describe('TeamController', () => {
 
         const mockResponse = [];
 
-        const mockAuthService = jest
+        jest
           .spyOn(authService, 'getUserFromToken')
           .mockImplementation(() => mockJwtPayload);
 
-        const mockService = jest
-          .spyOn(service, 'getTeamsByLead')
-          .mockImplementation(async () => {
-            return mockResponse;
-          });
+        jest.spyOn(service, 'getTeamsByLead').mockImplementation(async () => {
+          return mockResponse;
+        });
 
         const response = await controller.getTeams(
           requestMock,
@@ -310,8 +306,8 @@ describe('TeamController', () => {
 
         expect(response).toEqual(mockResponse);
 
-        expect(mockAuthService).toBeCalledTimes(1);
-        expect(mockService).toBeCalledTimes(1);
+        expect(authService.getUserFromToken).toBeCalledTimes(1);
+        expect(service.getTeamsByLead).toBeCalledTimes(1);
       });
     });
 
@@ -329,15 +325,13 @@ describe('TeamController', () => {
 
         const mockResponse = [];
 
-        const mockAuthService = jest
+        jest
           .spyOn(authService, 'getUserFromToken')
           .mockImplementation(() => mockJwtPayload);
 
-        const mockService = jest
-          .spyOn(service, 'getTeamsByMember')
-          .mockImplementation(async () => {
-            return mockResponse;
-          });
+        jest.spyOn(service, 'getTeamsByMember').mockImplementation(async () => {
+          return mockResponse;
+        });
 
         const response = await controller.getTeams(
           requestMock,
@@ -346,8 +340,8 @@ describe('TeamController', () => {
 
         expect(response).toEqual(mockResponse);
 
-        expect(mockAuthService).toBeCalledTimes(1);
-        expect(mockService).toBeCalledTimes(1);
+        expect(authService.getUserFromToken).toBeCalledTimes(1);
+        expect(service.getTeamsByMember).toBeCalledTimes(1);
       });
     });
 
