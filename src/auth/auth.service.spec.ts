@@ -48,14 +48,14 @@ describe('AuthService', () => {
           userId: 'userId',
         };
 
-        const mockJwtService = jest
+        jest
           .spyOn(jwtService, 'verify')
           .mockImplementation((): JWTPayload => mockPayload);
 
         const payload = service.getUserFromToken('Bearer token');
 
         expect(payload).toEqual(mockPayload);
-        expect(mockJwtService).toBeCalledTimes(1);
+        expect(jwtService.verify).toBeCalledTimes(1);
       });
     });
   });
@@ -63,14 +63,12 @@ describe('AuthService', () => {
   describe('generateAccessToken()', () => {
     describe('When userId is passed', () => {
       it('should return signed access token', async () => {
-        const mockJwtService = jest
-          .spyOn(jwtService, 'sign')
-          .mockImplementation(() => 'signed-token');
+        jest.spyOn(jwtService, 'sign').mockImplementation(() => 'signed-token');
 
         const accessToken = await service.generateAccessToken('userId');
 
         expect(accessToken).toBe('signed-token');
-        expect(mockJwtService).toBeCalledTimes(1);
+        expect(jwtService.sign).toBeCalledTimes(1);
       });
     });
   });
@@ -78,21 +76,17 @@ describe('AuthService', () => {
   describe('generateRefreshToken()', () => {
     describe('When userId is passed', () => {
       it('should return signed refresh token', async () => {
-        const mockJwtService = jest
-          .spyOn(jwtService, 'sign')
-          .mockImplementation(() => 'signed-token');
+        jest.spyOn(jwtService, 'sign').mockImplementation(() => 'signed-token');
 
-        const mockRedisService = jest
-          .spyOn(redisService, 'saveRefreshToken')
-          .mockImplementation(() => {
-            return new Promise((res) => res());
-          });
+        jest.spyOn(redisService, 'saveRefreshToken').mockImplementation(() => {
+          return new Promise((res) => res());
+        });
 
         const accessToken = await service.generateRefreshToken('userId');
 
         expect(accessToken).toBe('signed-token');
-        expect(mockJwtService).toBeCalledTimes(1);
-        expect(mockRedisService).toBeCalledTimes(1);
+        expect(jwtService.sign).toBeCalledTimes(1);
+        expect(redisService.saveRefreshToken).toBeCalledTimes(1);
       });
     });
   });
@@ -100,11 +94,9 @@ describe('AuthService', () => {
   describe('generateAccessTokenByRefreshToken()', () => {
     describe('When refresh token is valid', () => {
       it('should return signed access token', async () => {
-        const mockJwtService = jest
-          .spyOn(jwtService, 'sign')
-          .mockImplementation(() => 'signed-token');
+        jest.spyOn(jwtService, 'sign').mockImplementation(() => 'signed-token');
 
-        const mockRedisService = jest
+        jest
           .spyOn(redisService, 'isRefreshTokenValid')
           .mockImplementation(() => {
             return new Promise((res) => res());
@@ -116,8 +108,8 @@ describe('AuthService', () => {
         );
 
         expect(accessToken).toBe('signed-token');
-        expect(mockJwtService).toBeCalledTimes(1);
-        expect(mockRedisService).toBeCalledTimes(1);
+        expect(jwtService.sign).toBeCalledTimes(1);
+        expect(redisService.isRefreshTokenValid).toBeCalledTimes(1);
       });
     });
 
