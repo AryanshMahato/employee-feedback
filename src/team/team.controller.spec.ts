@@ -17,7 +17,7 @@ import { AuthService } from '../auth/auth.service';
 import { JWTPayload } from '../auth/auth.types';
 import { UserService } from '../user/user.service';
 import { Request } from 'express';
-import { CreateTeamRequestBody } from './team.validation';
+import { CreateTeamRequestBody, GetTeamsQuery } from './team.validation';
 
 describe('TeamController', () => {
   let controller: TeamController;
@@ -196,6 +196,188 @@ describe('TeamController', () => {
           expect('This line not to be executed').toBeFalsy();
         } catch (e) {
           expect(e).toBeInstanceOf(InternalServerErrorException);
+        }
+      });
+    });
+  });
+
+  describe('getTeams()', () => {
+    const mockJwtPayload: JWTPayload = {
+      exp: 3600,
+      iat: 3600,
+      tokenType: 'Bearer',
+      userId: 'userId',
+    };
+
+    describe('When all teams are queried', () => {
+      it('should return all teams', async () => {
+        const requestMock = {
+          headers: {
+            authorization: 'Bearer token',
+          },
+        } as Request;
+
+        const requestQueryMock = {} as GetTeamsQuery;
+
+        const mockResponse = { created: [], lead: [], member: [] };
+
+        const mockAuthService = jest
+          .spyOn(authService, 'getUserFromToken')
+          .mockImplementation(() => mockJwtPayload);
+
+        const mockService = jest
+          .spyOn(service, 'getTeamsByUserId')
+          .mockImplementation(async () => {
+            return mockResponse;
+          });
+
+        const response = await controller.getTeams(
+          requestMock,
+          requestQueryMock,
+        );
+
+        expect(response).toEqual(mockResponse);
+
+        expect(mockAuthService).toBeCalledTimes(1);
+        expect(mockService).toBeCalledTimes(1);
+      });
+    });
+
+    describe('When created teams are queried', () => {
+      it('should return created teams', async () => {
+        const requestMock = {
+          headers: {
+            authorization: 'Bearer token',
+          },
+        } as Request;
+
+        const requestQueryMock = {
+          method: 'created',
+        } as GetTeamsQuery;
+
+        const mockResponse = [];
+
+        const mockAuthService = jest
+          .spyOn(authService, 'getUserFromToken')
+          .mockImplementation(() => mockJwtPayload);
+
+        const mockService = jest
+          .spyOn(service, 'getTeamsByCreator')
+          .mockImplementation(async () => {
+            return mockResponse;
+          });
+
+        const response = await controller.getTeams(
+          requestMock,
+          requestQueryMock,
+        );
+
+        expect(response).toEqual(mockResponse);
+
+        expect(mockAuthService).toBeCalledTimes(1);
+        expect(mockService).toBeCalledTimes(1);
+      });
+    });
+
+    describe('When led teams are queried', () => {
+      it('should return led teams', async () => {
+        const requestMock = {
+          headers: {
+            authorization: 'Bearer token',
+          },
+        } as Request;
+
+        const requestQueryMock = {
+          method: 'lead',
+        } as GetTeamsQuery;
+
+        const mockResponse = [];
+
+        const mockAuthService = jest
+          .spyOn(authService, 'getUserFromToken')
+          .mockImplementation(() => mockJwtPayload);
+
+        const mockService = jest
+          .spyOn(service, 'getTeamsByLead')
+          .mockImplementation(async () => {
+            return mockResponse;
+          });
+
+        const response = await controller.getTeams(
+          requestMock,
+          requestQueryMock,
+        );
+
+        expect(response).toEqual(mockResponse);
+
+        expect(mockAuthService).toBeCalledTimes(1);
+        expect(mockService).toBeCalledTimes(1);
+      });
+    });
+
+    describe('When membered teams are queried', () => {
+      it('should return membered teams', async () => {
+        const requestMock = {
+          headers: {
+            authorization: 'Bearer token',
+          },
+        } as Request;
+
+        const requestQueryMock = {
+          method: 'member',
+        } as GetTeamsQuery;
+
+        const mockResponse = [];
+
+        const mockAuthService = jest
+          .spyOn(authService, 'getUserFromToken')
+          .mockImplementation(() => mockJwtPayload);
+
+        const mockService = jest
+          .spyOn(service, 'getTeamsByMember')
+          .mockImplementation(async () => {
+            return mockResponse;
+          });
+
+        const response = await controller.getTeams(
+          requestMock,
+          requestQueryMock,
+        );
+
+        expect(response).toEqual(mockResponse);
+
+        expect(mockAuthService).toBeCalledTimes(1);
+        expect(mockService).toBeCalledTimes(1);
+      });
+    });
+
+    describe('When auth token is invalid', () => {
+      it('should throw UnauthorizedException', async () => {
+        const requestMock = {
+          headers: {
+            authorization: 'Bearer token',
+          },
+        } as Request;
+
+        const requestQueryMock = {
+          method: 'member',
+        } as GetTeamsQuery;
+
+        const mockResponse = [];
+
+        jest.spyOn(authService, 'getUserFromToken').mockImplementation(() => {
+          throw new UnauthorizedException();
+        });
+
+        jest.spyOn(service, 'getTeamsByMember').mockImplementation(async () => {
+          return mockResponse;
+        });
+
+        try {
+          await controller.getTeams(requestMock, requestQueryMock);
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).toBeInstanceOf(UnauthorizedException);
         }
       });
     });
