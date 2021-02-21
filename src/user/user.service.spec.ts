@@ -53,26 +53,22 @@ describe('UsersService', () => {
 
     describe('when signup is called and database operation is successful', () => {
       it('should return correct userId', async () => {
-        const mockUserModel = jest
-          .spyOn(userModel, 'create')
-          .mockImplementation(async () => {
-            return { id: Data.userId };
-          });
+        jest.spyOn(userModel, 'create').mockImplementation(async () => {
+          return { id: Data.userId };
+        });
 
         const userId = await service.signUp(Data);
 
         expect(userId).toBe(Data.userId);
-        expect(mockUserModel).toBeCalledTimes(1);
+        expect(userModel.create).toBeCalledTimes(1);
       });
     });
 
     describe('when signup is called and database operation is failed', () => {
       it('should throw same error', async () => {
-        const mockUserCreate = jest
-          .spyOn(userModel, 'create')
-          .mockImplementation(async () => {
-            throw new Error('unknown error');
-          });
+        jest.spyOn(userModel, 'create').mockImplementation(async () => {
+          throw new Error('unknown error');
+        });
 
         let userId: string;
 
@@ -84,7 +80,7 @@ describe('UsersService', () => {
           expect(e?.message).toBe('unknown error');
 
           expect(userId).not.toBeDefined();
-          expect(mockUserCreate).toBeCalledTimes(1);
+          expect(userModel.create).toBeCalledTimes(1);
         }
       });
     });
@@ -98,51 +94,47 @@ describe('UsersService', () => {
 
     describe('when database is called with and user is found by username', () => {
       it('should return correct name', async () => {
-        const mockUserFindOne = jest
-          .spyOn(userModel, 'findOne')
-          .mockImplementation(() => {
-            return {
-              populate: (): unknown => ({
-                select: (): unknown => ({
-                  exec: (): unknown => ({
-                    id: Data.id,
-                    name: Data.name,
-                  }),
+        jest.spyOn(userModel, 'findOne').mockImplementation(() => {
+          return {
+            populate: (): unknown => ({
+              select: (): unknown => ({
+                exec: (): unknown => ({
+                  id: Data.id,
+                  name: Data.name,
                 }),
               }),
-            };
-          });
+            }),
+          };
+        });
 
         const user = await service.getUser(Data.id, 'username');
 
         expect(user).toEqual(Data);
 
-        expect(mockUserFindOne).toBeCalledTimes(1);
+        expect(userModel.findOne).toBeCalledTimes(1);
       });
     });
 
     describe('when database is called with and user is found by email', () => {
       it('should return correct name', async () => {
-        const mockUserFindOne = jest
-          .spyOn(userModel, 'findOne')
-          .mockImplementation(() => {
-            return {
-              populate: (): unknown => ({
-                select: (): unknown => ({
-                  exec: (): unknown => ({
-                    id: Data.id,
-                    name: Data.name,
-                  }),
+        jest.spyOn(userModel, 'findOne').mockImplementation(() => {
+          return {
+            populate: (): unknown => ({
+              select: (): unknown => ({
+                exec: (): unknown => ({
+                  id: Data.id,
+                  name: Data.name,
                 }),
               }),
-            };
-          });
+            }),
+          };
+        });
 
         const user = await service.getUser(Data.id, 'email');
 
         expect(user).toEqual(Data);
 
-        expect(mockUserFindOne).toBeCalledTimes(1);
+        expect(userModel.findOne).toBeCalledTimes(1);
       });
     });
   });
@@ -155,25 +147,21 @@ describe('UsersService', () => {
 
     describe('When teamId is added to owned teams', () => {
       it('should not throw any error', async () => {
-        const mockUserFindByIdAndUpdate = jest
-          .spyOn(userModel, 'findByIdAndUpdate')
-          .mockImplementation(() => {
-            return;
-          });
+        jest.spyOn(userModel, 'findByIdAndUpdate').mockImplementation(() => {
+          return;
+        });
 
         await service.addTeamToOwnedTeams(Data.userId, Data.teamId);
 
-        expect(mockUserFindByIdAndUpdate).toBeCalledTimes(1);
+        expect(userModel.findByIdAndUpdate).toBeCalledTimes(1);
       });
     });
 
     describe('When teamId is failed to add in owned teams', () => {
       it('should not throw error', async () => {
-        const mockUserFindByIdAndUpdate = jest
-          .spyOn(userModel, 'findByIdAndUpdate')
-          .mockImplementation(() => {
-            throw new Error();
-          });
+        jest.spyOn(userModel, 'findByIdAndUpdate').mockImplementation(() => {
+          throw new Error();
+        });
 
         try {
           await service.addTeamToOwnedTeams(Data.userId, Data.teamId);
@@ -181,7 +169,7 @@ describe('UsersService', () => {
         } catch (e) {
           expect(e).toBeInstanceOf(Error);
 
-          expect(mockUserFindByIdAndUpdate).toBeCalledTimes(1);
+          expect(userModel.findByIdAndUpdate).toBeCalledTimes(1);
         }
       });
     });
