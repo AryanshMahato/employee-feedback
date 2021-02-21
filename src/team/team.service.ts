@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { TeamPublicSelect, Team, TeamDocument } from './team.schema';
+import { Team, TeamDocument, TeamPublicSelect } from './team.schema';
 import { GetTeamByUserIdReturn, ITeam } from './team.types';
 import { User, UserPublicSelect } from '../user/user.schema';
 
@@ -14,10 +14,7 @@ export class TeamService {
   createTeam = async (
     teamData: Omit<ITeam, 'members'>,
   ): Promise<TeamDocument> => {
-    const team = new this.teamModel({ ...teamData } as Team);
-    await team.save();
-
-    return team;
+    return await this.teamModel.create({ ...teamData } as Team);
   };
 
   getTeamsByCreator = async (userId: string): Promise<ITeam[]> => {

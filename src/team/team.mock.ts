@@ -1,7 +1,11 @@
 import { Test } from '@nestjs/testing';
 import { TeamService } from './team.service';
 
-export class TeamModelMock {}
+export class TeamModelMock {
+  create(): void {
+    return;
+  }
+}
 
 export class TeamServiceMock {}
 
