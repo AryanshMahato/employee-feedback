@@ -67,19 +67,17 @@ describe('UsersController', () => {
 
     describe('When signup is called and user is created successfully', () => {
       it('should return mock userId', async () => {
-        const signUpMock = jest
-          .spyOn(service, 'signUp')
-          .mockImplementation(async () => {
-            return Data.id;
-          });
+        jest.spyOn(service, 'signUp').mockImplementation(async () => {
+          return Data.id;
+        });
 
-        const generateAccessTokenMock = jest
+        jest
           .spyOn(authService, 'generateAccessToken')
           .mockImplementation(async () => {
             return Data.accessToken;
           });
 
-        const generateRefreshTokenMock = jest
+        jest
           .spyOn(authService, 'generateRefreshToken')
           .mockImplementation(async () => {
             return Data.refreshToken;
@@ -89,27 +87,25 @@ describe('UsersController', () => {
 
         expect(signUpResponse).toEqual(Data);
 
-        expect(signUpMock).toBeCalledTimes(1);
-        expect(generateAccessTokenMock).toBeCalledTimes(1);
-        expect(generateRefreshTokenMock).toBeCalledTimes(1);
+        expect(service.signUp).toBeCalledTimes(1);
+        expect(authService.generateAccessToken).toBeCalledTimes(1);
+        expect(authService.generateRefreshToken).toBeCalledTimes(1);
       });
     });
 
     describe('When signup is called and user already exists in database', () => {
       it('should throw MongoError with 110000', async () => {
-        const signUpMock = jest
-          .spyOn(service, 'signUp')
-          .mockImplementation(async () => {
-            throw new MongoError({ code: 11000 });
-          });
+        jest.spyOn(service, 'signUp').mockImplementation(async () => {
+          throw new MongoError({ code: 11000 });
+        });
 
-        const generateAccessTokenMock = jest
+        jest
           .spyOn(authService, 'generateAccessToken')
           .mockImplementation(async () => {
             return Data.accessToken;
           });
 
-        const generateRefreshTokenMock = jest
+        jest
           .spyOn(authService, 'generateRefreshToken')
           .mockImplementation(async () => {
             return Data.refreshToken;
@@ -125,28 +121,24 @@ describe('UsersController', () => {
           expect(e).toBeInstanceOf(ConflictException);
           expect(e?.message).toBe('Conflict in user signup');
 
-          expect(signUpMock).toBeCalledTimes(1);
-          expect(generateAccessTokenMock).toBeCalledTimes(0);
-          expect(generateRefreshTokenMock).toBeCalledTimes(0);
+          expect(service.signUp).toBeCalledTimes(1);
         }
       });
     });
 
     describe('When signup is called and there is some unknown error', () => {
       it('should throw unknown error', async () => {
-        const signUpMock = jest
-          .spyOn(service, 'signUp')
-          .mockImplementation(async () => {
-            throw new Error('unknown error');
-          });
+        jest.spyOn(service, 'signUp').mockImplementation(async () => {
+          throw new Error('unknown error');
+        });
 
-        const generateAccessTokenMock = jest
+        jest
           .spyOn(authService, 'generateAccessToken')
           .mockImplementation(async () => {
             return Data.accessToken;
           });
 
-        const generateRefreshTokenMock = jest
+        jest
           .spyOn(authService, 'generateRefreshToken')
           .mockImplementation(async () => {
             return Data.refreshToken;
@@ -162,9 +154,7 @@ describe('UsersController', () => {
           expect(e).toBeInstanceOf(Error);
           expect(e?.message).toBe('unknown error');
 
-          expect(signUpMock).toBeCalledTimes(1);
-          expect(generateAccessTokenMock).toBeCalledTimes(0);
-          expect(generateRefreshTokenMock).toBeCalledTimes(0);
+          expect(service.signUp).toBeCalledTimes(1);
         }
       });
     });
@@ -178,21 +168,19 @@ describe('UsersController', () => {
 
     describe('When signIn is called and user is authenticated successfully successfully', () => {
       it('should return mock userId', async () => {
-        const getUserMock = jest
-          .spyOn(service, 'getUser')
-          .mockImplementation(async () => {
-            return {
-              password: 'my password',
-            } as UserDocument;
-          });
+        jest.spyOn(service, 'getUser').mockImplementation(async () => {
+          return {
+            password: 'my password',
+          } as UserDocument;
+        });
 
-        const generateAccessTokenMock = jest
+        jest
           .spyOn(authService, 'generateAccessToken')
           .mockImplementation(async () => {
             return Data.accessToken;
           });
 
-        const generateRefreshTokenMock = jest
+        jest
           .spyOn(authService, 'generateRefreshToken')
           .mockImplementation(async () => {
             return Data.refreshToken;
@@ -207,29 +195,27 @@ describe('UsersController', () => {
 
         expect(signInResponse).toEqual(Data);
 
-        expect(getUserMock).toBeCalledTimes(1);
-        expect(generateAccessTokenMock).toBeCalledTimes(1);
-        expect(generateRefreshTokenMock).toBeCalledTimes(1);
+        expect(service.getUser).toBeCalledTimes(1);
+        expect(authService.generateAccessToken).toBeCalledTimes(1);
+        expect(authService.generateRefreshToken).toBeCalledTimes(1);
       });
     });
 
     describe('When signIn is called and user password did not matched', () => {
       it('should throw UnauthorizedException', async () => {
-        const getUserMock = jest
-          .spyOn(service, 'getUser')
-          .mockImplementation(async () => {
-            return {
-              password: 'different password',
-            } as UserDocument;
-          });
+        jest.spyOn(service, 'getUser').mockImplementation(async () => {
+          return {
+            password: 'different password',
+          } as UserDocument;
+        });
 
-        const generateAccessTokenMock = jest
+        jest
           .spyOn(authService, 'generateAccessToken')
           .mockImplementation(async () => {
             return Data.accessToken;
           });
 
-        const generateRefreshTokenMock = jest
+        jest
           .spyOn(authService, 'generateRefreshToken')
           .mockImplementation(async () => {
             return Data.refreshToken;
@@ -249,28 +235,24 @@ describe('UsersController', () => {
           expect(signInResponse).not.toBeDefined();
           expect(e).toBeInstanceOf(UnauthorizedException);
 
-          expect(getUserMock).toBeCalledTimes(1);
-          expect(generateAccessTokenMock).toBeCalledTimes(0);
-          expect(generateRefreshTokenMock).toBeCalledTimes(0);
+          expect(service.getUser).toBeCalledTimes(1);
         }
       });
     });
 
     describe('When signIn is called but user is not found', () => {
       it('should throw NotFoundException', async () => {
-        const getUserMock = jest
-          .spyOn(service, 'getUser')
-          .mockImplementation(async () => {
-            return null;
-          });
+        jest.spyOn(service, 'getUser').mockImplementation(async () => {
+          return null;
+        });
 
-        const generateAccessTokenMock = jest
+        jest
           .spyOn(authService, 'generateAccessToken')
           .mockImplementation(async () => {
             return Data.accessToken;
           });
 
-        const generateRefreshTokenMock = jest
+        jest
           .spyOn(authService, 'generateRefreshToken')
           .mockImplementation(async () => {
             return Data.refreshToken;
@@ -290,9 +272,7 @@ describe('UsersController', () => {
           expect(signInResponse).not.toBeDefined();
           expect(e).toBeInstanceOf(NotFoundException);
 
-          expect(getUserMock).toBeCalledTimes(1);
-          expect(generateAccessTokenMock).toBeCalledTimes(0);
-          expect(generateRefreshTokenMock).toBeCalledTimes(0);
+          expect(service.getUser).toBeCalledTimes(1);
         }
       });
     });
@@ -309,11 +289,9 @@ describe('UsersController', () => {
 
     describe('when getUser is called and user is found in database', () => {
       it('should return the correct user data', async () => {
-        const mockGetUser = jest
-          .spyOn(service, 'getUser')
-          .mockImplementation(async () => {
-            return Data as UserDocument;
-          });
+        jest.spyOn(service, 'getUser').mockImplementation(async () => {
+          return Data as UserDocument;
+        });
 
         const getUserResponse = await controller.getUser(
           { userId: Data.username },
@@ -322,17 +300,15 @@ describe('UsersController', () => {
 
         expect(getUserResponse).toEqual(Data);
 
-        expect(mockGetUser).toBeCalledTimes(1);
+        expect(service.getUser).toBeCalledTimes(1);
       });
     });
 
     describe('when getUser is called and user is not found in database', () => {
       it('should throw NotFoundException', async () => {
-        const mockGetUser = jest
-          .spyOn(service, 'getUser')
-          .mockImplementation(async () => {
-            return null;
-          });
+        jest.spyOn(service, 'getUser').mockImplementation(async () => {
+          return null;
+        });
 
         let getUserResponse: GetUserResponse;
 
@@ -347,7 +323,7 @@ describe('UsersController', () => {
           expect(e).toBeInstanceOf(NotFoundException);
           expect(e?.message).toBe('user not found');
 
-          expect(mockGetUser).toBeCalledTimes(1);
+          expect(service.getUser).toBeCalledTimes(1);
         }
       });
     });
@@ -365,16 +341,14 @@ describe('UsersController', () => {
 
     describe('when generateAccessToken is called and user is found in database and token is generated successfully', () => {
       it('should return generated access token', async () => {
-        const mockGetUser = jest
-          .spyOn(service, 'getUser')
-          .mockImplementation(async () => {
-            return ({
-              ...Data,
-              accessToken: undefined,
-            } as unknown) as UserDocument;
-          });
+        jest.spyOn(service, 'getUser').mockImplementation(async () => {
+          return ({
+            ...Data,
+            accessToken: undefined,
+          } as unknown) as UserDocument;
+        });
 
-        const mockGenerateAccessTokenByRefreshToken = jest
+        jest
           .spyOn(authService, 'generateAccessTokenByRefreshToken')
           .mockImplementation(async () => {
             return Data.accessToken;
@@ -390,20 +364,20 @@ describe('UsersController', () => {
           accessToken: Data.accessToken,
         });
 
-        expect(mockGetUser).toBeCalledTimes(1);
-        expect(mockGenerateAccessTokenByRefreshToken).toBeCalledTimes(1);
+        expect(service.getUser).toBeCalledTimes(1);
+        expect(authService.generateAccessTokenByRefreshToken).toBeCalledTimes(
+          1,
+        );
       });
     });
 
     describe('when generateAccessToken is called and user is not found in database', () => {
       it('should throw NotFoundException', async () => {
-        const mockGetUser = jest
-          .spyOn(service, 'getUser')
-          .mockImplementation(async () => {
-            return null;
-          });
+        jest.spyOn(service, 'getUser').mockImplementation(async () => {
+          return null;
+        });
 
-        const mockGenerateAccessTokenByRefreshToken = jest
+        jest
           .spyOn(authService, 'generateAccessTokenByRefreshToken')
           .mockImplementation(async () => {
             return Data.accessToken;
@@ -423,8 +397,7 @@ describe('UsersController', () => {
           expect(e).toBeInstanceOf(NotFoundException);
           expect(e?.message).toBe('user not found');
 
-          expect(mockGetUser).toBeCalledTimes(1);
-          expect(mockGenerateAccessTokenByRefreshToken).toBeCalledTimes(0);
+          expect(service.getUser).toBeCalledTimes(1);
         }
       });
     });
