@@ -9,7 +9,7 @@ import { EnvConfig } from '../config/EnvConfig';
 import { TeamController } from './team.controller';
 import { TeamModelMock } from './team.mock';
 import { UserModuleMock } from '../user/user.mock';
-import { ITeam } from './team.types';
+import { GetTeamByUserIdReturn, ITeam } from './team.types';
 import { User, UserPublicSelect } from '../user/user.schema';
 import clearAllMocks = jest.clearAllMocks;
 
@@ -198,6 +198,65 @@ describe('TeamService', () => {
           model: User,
           select: UserPublicSelect,
         });
+      });
+    });
+  });
+
+  describe('getTeamsByUserId()', () => {
+    const mockTeams = {
+      lead: [
+        {
+          name: 'Avengers',
+          creator: 'creatorId',
+          description: 'this is a description',
+          lead: 'leaderId',
+          members: ['memberId'],
+        },
+      ],
+      created: [
+        {
+          name: 'Avengers',
+          creator: 'creatorId',
+          description: 'this is a description',
+          lead: 'leaderId',
+          members: ['memberId'],
+        },
+      ],
+      member: [
+        {
+          name: 'Avengers',
+          creator: 'creatorId',
+          description: 'this is a description',
+          lead: 'leaderId',
+          members: ['memberId'],
+        },
+      ],
+    } as GetTeamByUserIdReturn;
+
+    describe('When team is found successfully', () => {
+      it('should return correct teams', async () => {
+        jest
+          .spyOn(service, 'getTeamsByMember')
+          .mockImplementation(async () => mockTeams.member);
+        jest
+          .spyOn(service, 'getTeamsByCreator')
+          .mockImplementation(async () => mockTeams.member);
+        jest
+          .spyOn(service, 'getTeamsByLead')
+          .mockImplementation(async () => mockTeams.member);
+
+        const teams = await service.getTeamsByUserId('userId');
+
+        expect(teams).toEqual(mockTeams);
+
+        expect(service.getTeamsByMember).toBeCalledTimes(1);
+        expect(service.getTeamsByMember).toBeCalledWith('userId');
+
+        expect(service.getTeamsByLead).toBeCalledTimes(1);
+        expect(service.getTeamsByLead).toBeCalledWith('userId');
+
+        expect(service.getTeamsByCreator).toBeCalledTimes(1);
+        expect(service.getTeamsByCreator).toBeCalledWith('userId');
       });
     });
   });
