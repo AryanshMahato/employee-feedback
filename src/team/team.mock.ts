@@ -5,6 +5,10 @@ export class TeamModelMock {
   create(): void {
     return;
   }
+
+  find(): unknown {
+    return;
+  }
 }
 
 export class TeamServiceMock {}

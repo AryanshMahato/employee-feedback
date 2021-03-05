@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeamService } from './team.service';
 import { getModelToken } from '@nestjs/mongoose';
-import { Team } from './team.schema';
+import { Team, TeamPublicSelect } from './team.schema';
 import { AuthModule } from '../auth/auth.module';
 import { forwardRef, InternalServerErrorException } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
@@ -9,6 +9,8 @@ import { EnvConfig } from '../config/EnvConfig';
 import { TeamController } from './team.controller';
 import { TeamModelMock } from './team.mock';
 import { UserModuleMock } from '../user/user.mock';
+import { ITeam } from './team.types';
+import { User, UserPublicSelect } from '../user/user.schema';
 
 describe('TeamService', () => {
   let service: TeamService;
@@ -82,6 +84,43 @@ describe('TeamService', () => {
         } catch (e) {
           expect(e).toBeInstanceOf(InternalServerErrorException);
         }
+      });
+    });
+  });
+
+  describe('getTeamsByCreator()', () => {
+    const mockTeam = [
+      {
+        name: 'Avengers',
+        creator: 'creatorId',
+        description: 'this is a description',
+        lead: 'leaderId',
+        members: ['memberId'],
+      },
+    ] as ITeam[];
+
+    describe('When teams is found successfully', () => {
+      it('should return correct ITeam[]', async () => {
+        const populate = jest.fn(() => mockTeam);
+        const select = jest.fn(() => ({ populate }));
+        jest.spyOn(teamModel, 'find').mockImplementation(() => ({ select }));
+
+        const teams = await service.getTeamsByCreator('userId');
+
+        expect(teams).toEqual(mockTeam);
+
+        expect(teamModel.find).toBeCalledTimes(1);
+        expect(teamModel.find).toBeCalledWith({ creator: 'userId' });
+
+        expect(select).toBeCalledTimes(1);
+        expect(select).toBeCalledWith(TeamPublicSelect);
+
+        expect(populate).toBeCalledTimes(1);
+        expect(populate).toBeCalledWith({
+          path: 'creator lead members',
+          model: User,
+          select: UserPublicSelect,
+        });
       });
     });
   });
