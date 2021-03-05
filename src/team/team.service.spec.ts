@@ -11,6 +11,9 @@ import { TeamModelMock } from './team.mock';
 import { UserModuleMock } from '../user/user.mock';
 import { ITeam } from './team.types';
 import { User, UserPublicSelect } from '../user/user.schema';
+import clearAllMocks = jest.clearAllMocks;
+
+afterEach(clearAllMocks);
 
 describe('TeamService', () => {
   let service: TeamService;
@@ -111,6 +114,80 @@ describe('TeamService', () => {
 
         expect(teamModel.find).toBeCalledTimes(1);
         expect(teamModel.find).toBeCalledWith({ creator: 'userId' });
+
+        expect(select).toBeCalledTimes(1);
+        expect(select).toBeCalledWith(TeamPublicSelect);
+
+        expect(populate).toBeCalledTimes(1);
+        expect(populate).toBeCalledWith({
+          path: 'creator lead members',
+          model: User,
+          select: UserPublicSelect,
+        });
+      });
+    });
+  });
+
+  describe('getTeamsByLead()', () => {
+    const mockTeam = [
+      {
+        name: 'Avengers',
+        creator: 'creatorId',
+        description: 'this is a description',
+        lead: 'leaderId',
+        members: ['memberId'],
+      },
+    ] as ITeam[];
+
+    describe('When teams is found successfully', () => {
+      it('should return correct ITeam[]', async () => {
+        const populate = jest.fn(() => mockTeam);
+        const select = jest.fn(() => ({ populate }));
+        jest.spyOn(teamModel, 'find').mockImplementation(() => ({ select }));
+
+        const teams = await service.getTeamsByLead('userId');
+
+        expect(teams).toEqual(mockTeam);
+
+        expect(teamModel.find).toBeCalledTimes(1);
+        expect(teamModel.find).toBeCalledWith({ lead: 'userId' });
+
+        expect(select).toBeCalledTimes(1);
+        expect(select).toBeCalledWith(TeamPublicSelect);
+
+        expect(populate).toBeCalledTimes(1);
+        expect(populate).toBeCalledWith({
+          path: 'creator lead members',
+          model: User,
+          select: UserPublicSelect,
+        });
+      });
+    });
+  });
+
+  describe('getTeamsByMember()', () => {
+    const mockTeam = [
+      {
+        name: 'Avengers',
+        creator: 'creatorId',
+        description: 'this is a description',
+        lead: 'leaderId',
+        members: ['memberId'],
+      },
+    ] as ITeam[];
+
+    describe('When teams is found successfully', () => {
+      it('should return correct ITeam[]', async () => {
+        const populate = jest.fn(() => mockTeam);
+        const select = jest.fn(() => ({ populate }));
+        jest.spyOn(teamModel, 'find').mockImplementation(() => ({ select }));
+
+        const teams = await service.getTeamsByMember('userId');
+
+        expect(teams).toEqual(mockTeam);
+
+        expect(teamModel.find).toBeCalledTimes(1);
+        expect(teamModel.find).toBeCalledWith({ members: 'userId' });
 
         expect(select).toBeCalledTimes(1);
         expect(select).toBeCalledWith(TeamPublicSelect);
