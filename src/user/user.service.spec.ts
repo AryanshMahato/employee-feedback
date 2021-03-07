@@ -205,4 +205,28 @@ describe('UsersService', () => {
       });
     });
   });
+
+  describe('getUserById', () => {
+    describe('When user is found', () => {
+      it('should respond with correct user', async () => {
+        jest
+          .spyOn(userModel, 'findById')
+          .mockImplementation(() => ({ id: 'userId' }));
+
+        const user = await service.getUserById('userid');
+
+        expect(user).toEqual({ id: 'userId' });
+      });
+    });
+
+    describe('When user is not found', () => {
+      it('should respond with null', async () => {
+        jest.spyOn(userModel, 'findById').mockImplementation(() => null);
+
+        const user = await service.getUserById('userid');
+
+        expect(user).toEqual(null);
+      });
+    });
+  });
 });

@@ -15,6 +15,10 @@ export class UserModelMock {
   findByIdAndUpdate = (): unknown => {
     return;
   };
+
+  findById = (): unknown => {
+    return;
+  };
 }
 
 export class UserServiceMock {
