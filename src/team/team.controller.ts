@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Post,
   Query,
   Req,
@@ -39,8 +40,14 @@ export class TeamController {
       creator: userId,
     });
 
-    // Todo: Add delete team if this fails
-    await this.userService.addTeamToOwnedTeams(userId, team.id);
+    try {
+      await this.userService.addTeamToOwnedTeams(userId, team.id);
+    } catch (e) {
+      await this.teamService.deleteTeam(team.id);
+      throw new InternalServerErrorException({
+        message: "team failed to be added to user's list",
+      });
+    }
 
     return {
       id: team.id,

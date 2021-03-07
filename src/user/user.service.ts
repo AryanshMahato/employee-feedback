@@ -83,4 +83,13 @@ export class UserService {
       },
     });
   };
+
+  deleteTeamFromOwnedList = async (
+    userId: string,
+    teamId: string,
+  ): Promise<void> => {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $pull: { ownedTeams: teamId },
+    });
+  };
 }

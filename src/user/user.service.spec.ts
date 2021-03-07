@@ -10,6 +10,7 @@ import { UserController } from './user.controller';
 import { UserModelMock } from './user.mock';
 import { TeamModuleMock } from '../team/team.mock';
 import clearAllMocks = jest.clearAllMocks;
+import { AssertionError } from 'assert';
 
 beforeEach(clearAllMocks);
 
@@ -170,6 +171,36 @@ describe('UsersService', () => {
           expect(e).toBeInstanceOf(Error);
 
           expect(userModel.findByIdAndUpdate).toBeCalledTimes(1);
+        }
+      });
+    });
+  });
+
+  describe('deleteTeamFromOwnedList()', () => {
+    describe('When team is deleted from owned list successfully', () => {
+      it('should not throw any error', async () => {
+        jest.spyOn(userModel, 'findByIdAndUpdate').mockImplementation(() => {});
+
+        await service.deleteTeamFromOwnedList('userId', 'teamId');
+
+        expect(userModel.findByIdAndUpdate).toBeCalledTimes(1);
+        expect(userModel.findByIdAndUpdate).toBeCalledWith('userId', {
+          $pull: { ownedTeams: 'teamId' },
+        });
+      });
+    });
+
+    describe('When team is deletion is failed from owned list', () => {
+      it('should not throw any error', async () => {
+        jest.spyOn(userModel, 'findByIdAndUpdate').mockImplementation(() => {
+          throw new Error();
+        });
+
+        try {
+          await service.deleteTeamFromOwnedList('userId', 'teamId');
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).not.toBeInstanceOf(AssertionError);
         }
       });
     });
