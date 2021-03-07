@@ -6,9 +6,13 @@ import { Invitation, InvitationSchema } from './invitation.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { EnvConfig } from '../config/EnvConfig';
 import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
+import { TeamModule } from '../team/team.module';
 
 @Module({
   imports: [
+    UserModule,
+    TeamModule,
     MongooseModule.forFeature([
       { name: Invitation.name, schema: InvitationSchema },
     ]),

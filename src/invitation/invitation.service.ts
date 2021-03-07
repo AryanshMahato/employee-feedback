@@ -11,6 +11,14 @@ export class InvitationService {
   ) {}
 
   sendInvite = async (userId: string, teamId: string): Promise<string> => {
-    return;
+    const invitation = await this.invitationModel.create({
+      user: userId,
+      team: teamId,
+      accepted: false,
+      rejected: false,
+      deleted: false,
+    });
+
+    return invitation.id;
   };
 }

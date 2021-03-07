@@ -8,15 +8,27 @@ import { Request } from 'express';
 import { AuthModule } from '../auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { EnvConfig } from '../config/EnvConfig';
+import { UserModuleMock } from '../user/user.mock';
+import { TeamModuleMock } from '../team/team.mock';
+import { forwardRef } from '@nestjs/common';
+import { TeamService } from '../team/team.service';
+import { UserService } from '../user/user.service';
+import { UserDocument } from '../user/user.schema';
+import { TeamDocument } from '../team/team.schema';
 
 describe('InvitationController', () => {
   let controller: InvitationController;
   let service: InvitationService;
+  let teamService: TeamService;
+  let userService: UserService;
+
   const invitationModel = new InvitationModel();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        forwardRef(() => UserModuleMock),
+        forwardRef(() => TeamModuleMock),
         AuthModule,
         JwtModule.register({
           secret: EnvConfig.jwtSecret,
@@ -31,11 +43,15 @@ describe('InvitationController', () => {
 
     controller = module.get<InvitationController>(InvitationController);
     service = module.get<InvitationService>(InvitationService);
+    userService = await module.get<UserService>(UserService);
+    teamService = await module.get<TeamService>(TeamService);
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
     expect(service).toBeDefined();
+    expect(userService).toBeDefined();
+    expect(teamService).toBeDefined();
   });
 
   describe('sendInvitation', () => {
@@ -52,6 +68,16 @@ describe('InvitationController', () => {
         jest
           .spyOn(service, 'sendInvite')
           .mockImplementation(async () => 'invitationId');
+
+        jest
+          .spyOn(userService, 'getUserById')
+          .mockImplementation(async () => ({} as UserDocument));
+
+        jest
+          .spyOn(teamService, 'getTeamById')
+          .mockImplementation(
+            async () => ({ creator: 'userId' } as TeamDocument),
+          );
 
         const response = await controller.sendInvitation(
           requestMock,

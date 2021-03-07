@@ -39,7 +39,7 @@ export class UserService {
       .populate({
         path: 'ownedTeams',
         model: Team,
-        select: 'id name description lead createdAt updatedAt',
+        select: '_id name description lead createdAt updatedAt',
       })
       .select(clsx(UserPublicSelect, { password: withPassword }))
       .exec();
@@ -91,5 +91,9 @@ export class UserService {
     await this.userModel.findByIdAndUpdate(userId, {
       $pull: { ownedTeams: teamId },
     });
+  };
+
+  getUserById = async (id: string): Promise<UserDocument> => {
+    return this.userModel.findById(id);
   };
 }
