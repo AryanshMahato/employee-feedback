@@ -12,6 +12,7 @@ import { UserModuleMock } from '../user/user.mock';
 import { GetTeamByUserIdReturn, ITeam } from './team.types';
 import { User, UserPublicSelect } from '../user/user.schema';
 import clearAllMocks = jest.clearAllMocks;
+import { AssertionError } from 'assert';
 
 afterEach(clearAllMocks);
 
@@ -257,6 +258,33 @@ describe('TeamService', () => {
 
         expect(service.getTeamsByCreator).toBeCalledTimes(1);
         expect(service.getTeamsByCreator).toBeCalledWith('userId');
+      });
+    });
+  });
+
+  describe('deleteTeam()', () => {
+    describe('When team is deleted successfully', () => {
+      it('should not throw any error', async () => {
+        jest.spyOn(teamModel, 'findByIdAndDelete');
+
+        await service.deleteTeam('teamID');
+
+        expect(teamModel.findByIdAndDelete).toBeCalledTimes(1);
+      });
+    });
+    describe('When team deletion is failed', () => {
+      it('should not throw error', async () => {
+        jest.spyOn(teamModel, 'findByIdAndDelete').mockImplementation(() => {
+          throw new Error('db error');
+        });
+
+        try {
+          await service.deleteTeam('teamID');
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).not.toBeInstanceOf(AssertionError);
+          expect(e.message).toBe('db error');
+        }
       });
     });
   });

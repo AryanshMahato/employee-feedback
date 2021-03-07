@@ -9,6 +9,10 @@ export class TeamModelMock {
   find(): unknown {
     return;
   }
+
+  findByIdAndDelete(): void {
+    return;
+  }
 }
 
 export class TeamServiceMock {}

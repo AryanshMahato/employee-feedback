@@ -63,4 +63,8 @@ export class TeamService {
       member: await this.getTeamsByMember(userId),
     };
   };
+
+  deleteTeam = async (teamID: string): Promise<void> => {
+    await this.teamModel.findByIdAndDelete(teamID);
+  };
 }
