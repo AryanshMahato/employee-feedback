@@ -13,6 +13,10 @@ export class TeamModelMock {
   findByIdAndDelete(): void {
     return;
   }
+
+  findById(): unknown {
+    return;
+  }
 }
 
 export class TeamServiceMock {}

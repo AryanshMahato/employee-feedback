@@ -18,6 +18,7 @@ import { JWTPayload } from '../auth/auth.types';
 import { UserService } from '../user/user.service';
 import { Request } from 'express';
 import { CreateTeamRequestBody, GetTeamsQuery } from './team.validation';
+import { AssertionError } from 'assert';
 
 describe('TeamController', () => {
   let controller: TeamController;
@@ -371,6 +372,67 @@ describe('TeamController', () => {
           await controller.getTeams(requestMock, requestQueryMock);
           expect('This line not to be executed').toBeFalsy();
         } catch (e) {
+          expect(e).toBeInstanceOf(UnauthorizedException);
+        }
+      });
+    });
+  });
+
+  describe('deleteTeam', () => {
+    describe('When team is owned by the user', () => {
+      it('should delete that team', async () => {
+        const requestMock = {
+          headers: {
+            authorization: 'Bearer token',
+          },
+        } as Request;
+
+        jest.spyOn(authService, 'getUserFromToken').mockImplementation(() => {
+          return {
+            userId: 'userId',
+          } as JWTPayload;
+        });
+
+        jest.spyOn(service, 'isTeamOwner').mockImplementation(async () => true);
+
+        jest.spyOn(service, 'deleteTeam').mockImplementation(async () => {});
+
+        await controller.deleteTeam(requestMock, { teamId: 'teamId' });
+
+        expect(authService.getUserFromToken).toBeCalledTimes(1);
+
+        expect(service.isTeamOwner).toBeCalledTimes(1);
+        expect(service.isTeamOwner).toBeCalledWith('userId', 'teamId');
+
+        expect(service.deleteTeam).toBeCalledTimes(1);
+        expect(service.deleteTeam).toBeCalledWith('teamId');
+      });
+    });
+
+    describe('When team is not owned by the user', () => {
+      it('should not delete that team', async () => {
+        const requestMock = {
+          headers: {
+            authorization: 'Bearer token',
+          },
+        } as Request;
+
+        jest.spyOn(authService, 'getUserFromToken').mockImplementation(() => {
+          return {
+            userId: 'userId',
+          } as JWTPayload;
+        });
+
+        jest
+          .spyOn(service, 'isTeamOwner')
+          .mockImplementation(async () => false);
+
+        jest.spyOn(service, 'deleteTeam').mockImplementation(async () => {});
+
+        try {
+          await controller.deleteTeam(requestMock, { teamId: 'teamId' });
+        } catch (e) {
+          expect(e).not.toBeInstanceOf(AssertionError);
           expect(e).toBeInstanceOf(UnauthorizedException);
         }
       });

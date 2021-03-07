@@ -288,4 +288,34 @@ describe('TeamService', () => {
       });
     });
   });
+
+  describe('isTeamOwner', () => {
+    describe('When team is owned by same user', () => {
+      it('should return true', async () => {
+        jest.spyOn(teamModel, 'findById').mockImplementation(() => {
+          return {
+            creator: 'userId',
+          };
+        });
+
+        const isOwner = await service.isTeamOwner('userId', 'teamId');
+
+        expect(isOwner).toBeTruthy();
+      });
+    });
+
+    describe('When team is not owned by same user', () => {
+      it('should return true', async () => {
+        jest.spyOn(teamModel, 'findById').mockImplementation(() => {
+          return {
+            creator: 'differentUserId',
+          };
+        });
+
+        const isOwner = await service.isTeamOwner('userId', 'teamId');
+
+        expect(isOwner).toBeFalsy();
+      });
+    });
+  });
 });

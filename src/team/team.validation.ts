@@ -33,3 +33,8 @@ export class GetTeamsQuery {
   })
   method: GetTeamMethods;
 }
+
+export class DeleteTeamValidationParams {
+  @IsNotEmpty()
+  teamId: string;
+}

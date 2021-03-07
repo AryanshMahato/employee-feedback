@@ -1,11 +1,14 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   InternalServerErrorException,
+  Param,
   Post,
   Query,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { TeamService } from './team.service';
@@ -14,7 +17,11 @@ import { AuthGuard } from '../auth/auth.guard';
 import { AuthService } from '../auth/auth.service';
 import { Request } from 'express';
 import { UserService } from '../user/user.service';
-import { CreateTeamRequestBody, GetTeamsQuery } from './team.validation';
+import {
+  CreateTeamRequestBody,
+  DeleteTeamValidationParams,
+  GetTeamsQuery,
+} from './team.validation';
 
 @Controller()
 export class TeamController {
@@ -75,5 +82,23 @@ export class TeamController {
       default:
         return this.teamService.getTeamsByUserId(userId);
     }
+  }
+
+  @Delete('teams/:teamId')
+  @UseGuards(AuthGuard)
+  async deleteTeam(
+    @Req() req: Request,
+    @Param() params: DeleteTeamValidationParams,
+  ): Promise<void> {
+    const { userId } = this.authService.getUserFromToken(
+      req.headers.authorization,
+    );
+
+    const isOwner = await this.teamService.isTeamOwner(userId, params.teamId);
+    if (!isOwner) {
+      throw new UnauthorizedException('not allowed to delete team');
+    }
+
+    await this.teamService.deleteTeam(params.teamId);
   }
 }

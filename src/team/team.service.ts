@@ -64,6 +64,11 @@ export class TeamService {
     };
   };
 
+  isTeamOwner = async (userId: string, teamId: string): Promise<boolean> => {
+    const team = await this.teamModel.findById(teamId);
+    return team.creator.toString() === userId;
+  };
+
   deleteTeam = async (teamID: string): Promise<void> => {
     await this.teamModel.findByIdAndDelete(teamID);
   };
