@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Team, TeamDocument, TeamPublicSelect } from './team.schema';
-import { GetTeamByUserIdReturn, ITeam } from './team.types';
+import { EditableTeamFields, GetTeamByUserIdReturn, ITeam } from './team.types';
 import { User, UserPublicSelect } from '../user/user.schema';
 
 @Injectable()
@@ -71,5 +71,15 @@ export class TeamService {
 
   deleteTeam = async (teamID: string): Promise<void> => {
     await this.teamModel.findByIdAndDelete(teamID);
+  };
+
+  updateTeam = async (
+    teamId: string,
+    updatedTeam: EditableTeamFields,
+  ): Promise<void> => {
+    await this.teamModel.findByIdAndUpdate(teamId, {
+      name: updatedTeam.name,
+      description: updatedTeam.description,
+    });
   };
 }

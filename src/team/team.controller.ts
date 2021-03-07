@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UnauthorizedException,
@@ -19,8 +20,9 @@ import { Request } from 'express';
 import { UserService } from '../user/user.service';
 import {
   CreateTeamRequestBody,
-  DeleteTeamValidationParams,
+  TeamIdParamsValidation,
   GetTeamsQuery,
+  UpdateTeamRequestBody,
 } from './team.validation';
 
 @Controller()
@@ -84,11 +86,33 @@ export class TeamController {
     }
   }
 
+  @Put('teams/:teamId')
+  @UseGuards(AuthGuard)
+  async updateTeam(
+    @Req() req: Request,
+    @Param() params: TeamIdParamsValidation,
+    @Body() body: UpdateTeamRequestBody,
+  ): Promise<void> {
+    const { userId } = this.authService.getUserFromToken(
+      req.headers.authorization,
+    );
+
+    const isOwner = await this.teamService.isTeamOwner(userId, params.teamId);
+    if (!isOwner) {
+      throw new UnauthorizedException('not allowed to delete team');
+    }
+
+    await this.teamService.updateTeam(params.teamId, {
+      name: body.name,
+      description: body.description,
+    });
+  }
+
   @Delete('teams/:teamId')
   @UseGuards(AuthGuard)
   async deleteTeam(
     @Req() req: Request,
-    @Param() params: DeleteTeamValidationParams,
+    @Param() params: TeamIdParamsValidation,
   ): Promise<void> {
     const { userId } = this.authService.getUserFromToken(
       req.headers.authorization,

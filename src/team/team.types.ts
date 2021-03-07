@@ -2,6 +2,8 @@ import { Team } from './team.schema';
 
 export type ITeam = Team;
 
+export type EditableTeamFields = Pick<ITeam, 'name' | 'description'>;
+
 export interface CreateTeamResponse {
   message: string;
   id: string;

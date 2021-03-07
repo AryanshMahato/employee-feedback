@@ -34,7 +34,22 @@ export class GetTeamsQuery {
   method: GetTeamMethods;
 }
 
-export class DeleteTeamValidationParams {
+export class TeamIdParamsValidation {
   @IsNotEmpty()
   teamId: string;
+}
+
+export class UpdateTeamRequestBody {
+  @IsNotEmpty()
+  @IsString()
+  @Length(2, 32)
+  @Matches(NoSpecialCharacterRegex, {
+    message: 'no special characters allowed in name',
+  })
+  name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(2, 256)
+  description: string;
 }
