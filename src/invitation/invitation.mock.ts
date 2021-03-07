@@ -1,1 +1,5 @@
-export class InvitationModel {}
+export class InvitationModel {
+  create(): void {
+    return;
+  }
+}

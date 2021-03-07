@@ -3,6 +3,7 @@ import { InvitationService } from './invitation.service';
 import { getModelToken } from '@nestjs/mongoose';
 import { Invitation } from './invitation.schema';
 import { InvitationModel } from './invitation.mock';
+import { AssertionError } from 'assert';
 
 describe('InvitationService', () => {
   let service: InvitationService;
@@ -22,5 +23,34 @@ describe('InvitationService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('sendInvite', () => {
+    describe('When invitation is created successfully', () => {
+      it('should return correct id', async () => {
+        jest
+          .spyOn(invitationModel, 'create')
+          .mockImplementation(() => ({ id: 'invitationId' }));
+
+        const invitationId = await service.sendInvite('userId', 'teamId');
+
+        expect(invitationId).toBe('invitationId');
+      });
+    });
+
+    describe('When invitation creation is failed', () => {
+      it('should throw error', async () => {
+        jest.spyOn(invitationModel, 'create').mockImplementation(() => {
+          throw new Error();
+        });
+
+        try {
+          await service.sendInvite('userId', 'teamId');
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).not.toBeInstanceOf(AssertionError);
+        }
+      });
+    });
   });
 });
