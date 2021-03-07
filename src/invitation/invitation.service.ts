@@ -9,4 +9,8 @@ export class InvitationService {
     @InjectModel(Invitation.name)
     private readonly invitationModel: Model<InvitationDocument>,
   ) {}
+
+  sendInvite = async (userId: string, teamId: string): Promise<string> => {
+    return;
+  };
 }
