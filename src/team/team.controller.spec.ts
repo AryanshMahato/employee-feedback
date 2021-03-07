@@ -438,4 +438,84 @@ describe('TeamController', () => {
       });
     });
   });
+
+  describe('updateTeam', () => {
+    describe('When team is owned by the user', () => {
+      it('should update that team', async () => {
+        const requestMock = {
+          headers: {
+            authorization: 'Bearer token',
+          },
+        } as Request;
+
+        const mockTeam = {
+          name: 'name',
+          description: 'description',
+        };
+
+        jest.spyOn(authService, 'getUserFromToken').mockImplementation(() => {
+          return {
+            userId: 'userId',
+          } as JWTPayload;
+        });
+
+        jest.spyOn(service, 'isTeamOwner').mockImplementation(async () => true);
+
+        jest.spyOn(service, 'updateTeam').mockImplementation(async () => {});
+
+        await controller.updateTeam(
+          requestMock,
+          { teamId: 'teamId' },
+          mockTeam,
+        );
+
+        expect(authService.getUserFromToken).toBeCalledTimes(1);
+
+        expect(service.isTeamOwner).toBeCalledTimes(1);
+        expect(service.isTeamOwner).toBeCalledWith('userId', 'teamId');
+
+        expect(service.updateTeam).toBeCalledTimes(1);
+        expect(service.updateTeam).toBeCalledWith('teamId', mockTeam);
+      });
+    });
+
+    describe('When team is not owned by the user', () => {
+      it('should update that team', async () => {
+        const requestMock = {
+          headers: {
+            authorization: 'Bearer token',
+          },
+        } as Request;
+
+        const mockTeam = {
+          name: 'name',
+          description: 'description',
+        };
+
+        jest.spyOn(authService, 'getUserFromToken').mockImplementation(() => {
+          return {
+            userId: 'userId',
+          } as JWTPayload;
+        });
+
+        jest
+          .spyOn(service, 'isTeamOwner')
+          .mockImplementation(async () => false);
+
+        jest.spyOn(service, 'updateTeam').mockImplementation(async () => {});
+
+        try {
+          await controller.updateTeam(
+            requestMock,
+            { teamId: 'teamId' },
+            mockTeam,
+          );
+
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).toBeInstanceOf(UnauthorizedException);
+        }
+      });
+    });
+  });
 });
