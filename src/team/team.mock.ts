@@ -14,6 +14,10 @@ export class TeamModelMock {
     return;
   }
 
+  findByIdAndUpdate(): void {
+    return;
+  }
+
   findById(): unknown {
     return;
   }

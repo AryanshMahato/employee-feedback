@@ -318,4 +318,38 @@ describe('TeamService', () => {
       });
     });
   });
+
+  describe('updateTeam', () => {
+    const mockTeam = {
+      name: 'name',
+      description: 'description',
+    };
+
+    describe('When team is edited successfully', () => {
+      it('should not throw any error', async () => {
+        jest.spyOn(teamModel, 'findByIdAndUpdate').mockImplementation(() => {});
+
+        await service.updateTeam('teamId', mockTeam);
+
+        expect(teamModel.findByIdAndUpdate).toBeCalledTimes(1);
+        expect(teamModel.findByIdAndUpdate).toBeCalledWith('teamId', mockTeam);
+      });
+    });
+
+    describe('When team edit is failed', () => {
+      it('should throw error', async () => {
+        jest.spyOn(teamModel, 'findByIdAndUpdate').mockImplementation(() => {
+          throw new Error();
+        });
+
+        try {
+          await service.updateTeam('teamId', mockTeam);
+
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).not.toBeInstanceOf(AssertionError);
+        }
+      });
+    });
+  });
 });
