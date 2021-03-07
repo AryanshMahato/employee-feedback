@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { EnvConfig } from './config/EnvConfig';
 import {
   HealthCheckService,
-  HealthIndicatorResult,
   MongooseHealthIndicator,
   TerminusModule,
 } from '@nestjs/terminus';
@@ -47,50 +46,5 @@ describe('AppController', () => {
     expect(redisService).toBeDefined();
     expect(healthService).toBeDefined();
     expect(mongooseHealthIndicator).toBeDefined();
-  });
-
-  describe('getHealth()', () => {
-    describe('When mongoose and redis is up', () => {
-      it('should respond with correct body', async () => {
-        jest.spyOn(redisService, 'health').mockImplementation(() => {
-          return 'ready';
-        });
-
-        jest
-          .spyOn(mongooseHealthIndicator, 'pingCheck')
-          .mockImplementation(async () => {
-            return {
-              mongodb: {
-                status: 'up',
-              },
-            } as HealthIndicatorResult;
-          });
-
-        const health = await controller.getHealth();
-
-        expect(health).toEqual({
-          details: {
-            mongodb: {
-              status: 'up',
-            },
-            redisHealth: {
-              health: 'ready',
-              status: 'up',
-            },
-          },
-          error: {},
-          info: {
-            mongodb: {
-              status: 'up',
-            },
-            redisHealth: {
-              health: 'ready',
-              status: 'up',
-            },
-          },
-          status: 'ok',
-        });
-      });
-    });
   });
 });
