@@ -10,7 +10,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { EnvConfig } from '../config/EnvConfig';
 import { UserModuleMock } from '../user/user.mock';
 import { TeamModuleMock } from '../team/team.mock';
-import { forwardRef } from '@nestjs/common';
+import {
+  forwardRef,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { TeamService } from '../team/team.service';
 import { UserService } from '../user/user.service';
 import { UserDocument } from '../user/user.schema';
@@ -91,6 +95,107 @@ describe('InvitationController', () => {
           requestMock.body.userId,
           requestMock.body.teamId,
         );
+      });
+    });
+
+    describe('When user is not found', () => {
+      it('should throw NotFoundException', async () => {
+        const requestMock = {
+          headers: { authorization: 'Bearer token' },
+          body: {
+            teamId: 'teamId',
+            userId: 'userId',
+          },
+        } as Request;
+
+        jest
+          .spyOn(service, 'sendInvite')
+          .mockImplementation(async () => 'invitationId');
+
+        jest
+          .spyOn(userService, 'getUserById')
+          .mockImplementation(async () => null);
+
+        jest
+          .spyOn(teamService, 'getTeamById')
+          .mockImplementation(
+            async () => ({ creator: 'userId' } as TeamDocument),
+          );
+
+        try {
+          await controller.sendInvitation(requestMock, requestMock.body);
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).toBeInstanceOf(NotFoundException);
+          expect(e.message).toBe('user not found');
+        }
+      });
+    });
+
+    describe('When team is not found', () => {
+      it('should throw NotFoundException', async () => {
+        const requestMock = {
+          headers: { authorization: 'Bearer token' },
+          body: {
+            teamId: 'teamId',
+            userId: 'userId',
+          },
+        } as Request;
+
+        jest
+          .spyOn(service, 'sendInvite')
+          .mockImplementation(async () => 'invitationId');
+
+        jest
+          .spyOn(userService, 'getUserById')
+          .mockImplementation(async () => ({} as UserDocument));
+
+        jest
+          .spyOn(teamService, 'getTeamById')
+          .mockImplementation(async () => null);
+
+        try {
+          await controller.sendInvitation(requestMock, requestMock.body);
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).toBeInstanceOf(NotFoundException);
+          expect(e.message).toBe('team not found');
+        }
+      });
+    });
+
+    describe('When user is not team creator or team lead', () => {
+      it('should not send the invitation and throw UnauthorizedException', async () => {
+        const requestMock = {
+          headers: { authorization: 'Bearer token' },
+          body: {
+            teamId: 'teamId',
+            userId: 'userId',
+          },
+        } as Request;
+
+        jest
+          .spyOn(service, 'sendInvite')
+          .mockImplementation(async () => 'invitationId');
+
+        jest
+          .spyOn(userService, 'getUserById')
+          .mockImplementation(async () => ({} as UserDocument));
+
+        jest.spyOn(teamService, 'getTeamById').mockImplementation(
+          async () =>
+            ({
+              creator: 'differentUserId',
+              lead: 'differentUserId',
+            } as TeamDocument),
+        );
+
+        try {
+          await controller.sendInvitation(requestMock, requestMock.body);
+          expect('This line not to be executed').toBeFalsy();
+        } catch (e) {
+          expect(e).toBeInstanceOf(UnauthorizedException);
+        }
       });
     });
   });
