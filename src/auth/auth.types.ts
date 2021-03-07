@@ -1,6 +1,5 @@
 export interface JWTPayload {
-  username: string;
-  email: string;
+  userId: string;
   tokenType: string;
   iat: number;
   exp: number;

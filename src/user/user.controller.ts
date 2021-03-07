@@ -14,10 +14,7 @@ import {
 } from '@nestjs/common';
 import {
   GenerateAccessTokenResponse,
-  GetUserMethods,
-  IGetUserResponse,
-  ISignInRequest,
-  ISignUpRequest,
+  GetUserResponse,
   SignInResponse,
   SignUpResponse,
 } from './user.types';
@@ -27,6 +24,14 @@ import { AuthService } from '../auth/auth.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { AuthModule } from '../auth/auth.module';
+import {
+  GenerateAccessTokenRequestParams,
+  GenerateAccessTokenRequestQuery,
+  GetUserValidationParams,
+  GetUserValidationQuery,
+  SignInRequestBody,
+  SignUpRequestBody,
+} from './user.validation';
 
 @Controller()
 export class UserController {
@@ -36,17 +41,11 @@ export class UserController {
   ) {}
 
   @Post('user/signup')
-  async signUp(@Body() userData: ISignUpRequest): Promise<SignUpResponse> {
+  async signUp(@Body() userData: SignUpRequestBody): Promise<SignUpResponse> {
     try {
       const userId = await this.userService.signUp(userData);
-      const accessToken = await this.authService.generateAccessToken(
-        userData.username,
-        userData.email,
-      );
-      const refreshToken = await this.authService.generateRefreshToken(
-        userData.username,
-        userData.email,
-      );
+      const accessToken = await this.authService.generateAccessToken(userId);
+      const refreshToken = await this.authService.generateRefreshToken(userId);
 
       return {
         accessToken,
@@ -62,33 +61,31 @@ export class UserController {
           });
         }
       }
+
+      throw e;
     }
   }
 
   @Post('user/login')
   @HttpCode(200)
-  async login(@Body() userData: ISignInRequest): Promise<SignInResponse> {
+  async signIn(@Body() userData: SignInRequestBody): Promise<SignInResponse> {
     const user = await this.userService.getUser(
       userData.email || userData.username,
       userData.type,
+      { withPassword: true },
     );
 
     if (!user) {
       throw new NotFoundException('user not found');
     }
 
+    // TODO: Add password hashing
     if (user.password != userData.password) {
       throw new UnauthorizedException();
     }
 
-    const accessToken = await this.authService.generateAccessToken(
-      userData.username,
-      userData.email,
-    );
-    const refreshToken = await this.authService.generateRefreshToken(
-      userData.username,
-      userData.email,
-    );
+    const accessToken = await this.authService.generateAccessToken(user.id);
+    const refreshToken = await this.authService.generateRefreshToken(user.id);
 
     return {
       accessToken,
@@ -99,10 +96,10 @@ export class UserController {
   @Get('users/:userId')
   @UseGuards(AuthGuard)
   async getUser(
-    @Param('userId') userId: string,
-    @Query('method') method: GetUserMethods,
-  ): Promise<IGetUserResponse> {
-    const user = await this.userService.getUser(userId, method);
+    @Param() params: GetUserValidationParams,
+    @Query() query: GetUserValidationQuery,
+  ): Promise<GetUserResponse> {
+    const user = await this.userService.getUser(params.userId, query.method);
 
     if (!user) {
       throw new NotFoundException('user not found');
@@ -113,6 +110,7 @@ export class UserController {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      ownedTeams: user.ownedTeams,
     };
   }
 
@@ -120,15 +118,20 @@ export class UserController {
   @UseGuards(AuthGuard)
   async generateAccessToken(
     @Req() req: Request,
+    @Param() params: GenerateAccessTokenRequestParams,
+    @Query() query: GenerateAccessTokenRequestQuery,
   ): Promise<GenerateAccessTokenResponse> {
     const user = await this.userService.getUser(
-      req.params['userId'],
-      req.query['method'] as string,
+      params['userId'],
+      query['method'] as 'username' | 'email',
     );
 
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+
     const accessToken = await this.authService.generateAccessTokenByRefreshToken(
-      user.username,
-      user.email,
+      user.id,
       AuthModule.getTokenFromBearerToken(req.headers.authorization),
     );
 

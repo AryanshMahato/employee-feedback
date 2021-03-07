@@ -1,29 +1,16 @@
 import { User } from './user.schema';
+import { SignUpRequestBody } from './user.validation';
 
-export type ISignUpRequest = SignUpRequest;
-
-export class SignUpRequest {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
+export interface GetUserOptions {
+  withPassword: boolean;
 }
+
+export type SignUpRequest = SignUpRequestBody;
 
 export class SignUpResponse {
   id: string;
   accessToken: string;
   refreshToken: string;
-}
-
-export type ISignInRequest = SignInRequest;
-
-export class SignInRequest {
-  email?: string;
-  username?: string;
-  type: 'email' | 'username';
-  password: string;
 }
 
 export class SignInResponse {
@@ -37,6 +24,6 @@ export interface GenerateAccessTokenResponse {
 
 export type IUser = User;
 
-export type IGetUserResponse = Omit<IUser, 'password'>;
+export type GetUserResponse = Omit<IUser, 'password'>;
 
 export type GetUserMethods = 'username' | 'email';
