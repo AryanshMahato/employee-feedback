@@ -1,16 +1,24 @@
 import {
   Body,
   Controller,
+  Get,
   NotFoundException,
+  Param,
   Post,
   Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { SendInvitationResponse } from './invitation.types';
+import {
+  GetInvitationsResponse,
+  SendInvitationResponse,
+} from './invitation.types';
 import { InvitationService } from './invitation.service';
 import { Request } from 'express';
-import { SendInvitationRequestBody } from './invitation.validation';
+import {
+  GetInvitationsParam,
+  SendInvitationRequestBody,
+} from './invitation.validation';
 import { AuthGuard } from '../auth/auth.guard';
 import { TeamService } from '../team/team.service';
 import { UserService } from '../user/user.service';
@@ -54,5 +62,17 @@ export class InvitationController {
       };
     }
     throw new UnauthorizedException('not authorized to invite new members');
+  }
+
+  @Get('users/:userId/invitations')
+  async getInvitations(
+    @Param() param: GetInvitationsParam,
+  ): Promise<GetInvitationsResponse> {
+    const invitations = await this.invitationService.getInvitationsByUserId(
+      param.userId,
+    );
+    return {
+      invitations,
+    };
   }
 }

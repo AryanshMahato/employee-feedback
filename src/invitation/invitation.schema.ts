@@ -7,6 +7,8 @@ import { Document } from 'mongoose';
 
 export type InvitationDocument = Invitation & Document;
 
+export const InvitationPublicSelect = '_id team accepted rejected deleted';
+
 @Schema({
   timestamps: true,
 })

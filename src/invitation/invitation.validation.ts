@@ -9,3 +9,9 @@ export class SendInvitationRequestBody {
   @IsString()
   teamId: string;
 }
+
+export class GetInvitationsParam {
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
+}
