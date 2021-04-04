@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   NotFoundException,
-  Param,
   Post,
   Req,
   UnauthorizedException,
@@ -15,13 +14,11 @@ import {
 } from './invitation.types';
 import { InvitationService } from './invitation.service';
 import { Request } from 'express';
-import {
-  GetInvitationsParam,
-  SendInvitationRequestBody,
-} from './invitation.validation';
+import { SendInvitationRequestBody } from './invitation.validation';
 import { AuthGuard } from '../auth/auth.guard';
 import { TeamService } from '../team/team.service';
 import { UserService } from '../user/user.service';
+import { AuthService } from '../auth/auth.service';
 
 @Controller()
 export class InvitationController {
@@ -29,6 +26,7 @@ export class InvitationController {
     private readonly invitationService: InvitationService,
     private readonly teamService: TeamService,
     private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {}
 
   @Post('invitation')
@@ -64,13 +62,17 @@ export class InvitationController {
     throw new UnauthorizedException('not authorized to invite new members');
   }
 
-  @Get('users/:userId/invitations')
-  async getInvitations(
-    @Param() param: GetInvitationsParam,
-  ): Promise<GetInvitationsResponse> {
-    const invitations = await this.invitationService.getInvitationsByUserId(
-      param.userId,
+  @Get('invitations')
+  @UseGuards(AuthGuard)
+  async getInvitations(@Req() req: Request): Promise<GetInvitationsResponse> {
+    const { userId } = this.authService.getUserFromToken(
+      req.headers.authorization,
     );
+
+    const invitations = await this.invitationService.getInvitationsByUserId(
+      userId,
+    );
+
     return {
       invitations,
     };
