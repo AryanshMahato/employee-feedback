@@ -3,18 +3,24 @@ import {
   Controller,
   Get,
   NotFoundException,
+  Param,
+  Patch,
   Post,
   Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
+  AcceptInvitationResponse,
   GetInvitationsResponse,
   SendInvitationResponse,
 } from './invitation.types';
 import { InvitationService } from './invitation.service';
 import { Request } from 'express';
-import { SendInvitationRequestBody } from './invitation.validation';
+import {
+  AcceptInvitationsParam,
+  SendInvitationRequestBody,
+} from './invitation.validation';
 import { AuthGuard } from '../auth/auth.guard';
 import { TeamService } from '../team/team.service';
 import { UserService } from '../user/user.service';
@@ -75,6 +81,32 @@ export class InvitationController {
 
     return {
       invitations,
+    };
+  }
+
+  @Patch('invitations/:invitationId/accept')
+  @UseGuards(AuthGuard)
+  async acceptInvitation(
+    @Req() req: Request,
+    @Param() param: AcceptInvitationsParam,
+  ): Promise<AcceptInvitationResponse> {
+    const { userId } = this.authService.getUserFromToken(
+      req.headers.authorization,
+    );
+
+    const invitation = await this.invitationService.getInvitation(
+      param.invitationId,
+      userId,
+    );
+
+    if (!invitation) {
+      throw new NotFoundException('invitation not found');
+    }
+
+    await this.invitationService.acceptInvitation(param.invitationId);
+
+    return {
+      message: 'Invitation accepted',
     };
   }
 }

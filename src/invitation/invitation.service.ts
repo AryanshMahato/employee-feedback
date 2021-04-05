@@ -35,4 +35,26 @@ export class InvitationService {
       .select(InvitationPublicSelect)
       .exec();
   }
+
+  // Returns invitation by id of any user if userId is not passed
+  async getInvitation(
+    invitationId: string,
+    userId?: string,
+  ): Promise<TInvitation> {
+    if (typeof userId !== 'undefined') {
+      return this.invitationModel
+        .findOne({ id: invitationId, user: userId })
+        .populate({ path: 'team', model: Team, select: TeamPublicSelect })
+        .select(InvitationPublicSelect)
+        .exec();
+    }
+
+    return this.invitationModel.findById(invitationId).exec();
+  }
+
+  async acceptInvitation(invitationId: string): Promise<void> {
+    await this.invitationModel
+      .findByIdAndUpdate(invitationId, { accepted: true })
+      .exec();
+  }
 }

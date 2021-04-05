@@ -9,3 +9,7 @@ export class SendInvitationResponse {
 export class GetInvitationsResponse {
   invitations: TInvitation[];
 }
+
+export class AcceptInvitationResponse {
+  message: string;
+}

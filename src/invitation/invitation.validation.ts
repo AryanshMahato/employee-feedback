@@ -10,8 +10,8 @@ export class SendInvitationRequestBody {
   teamId: string;
 }
 
-export class GetInvitationsParam {
+export class AcceptInvitationsParam {
   @IsNotEmpty()
   @IsString()
-  userId: string;
+  invitationId: string;
 }
