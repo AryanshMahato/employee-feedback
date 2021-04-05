@@ -4,6 +4,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Invitation } from './invitation.schema';
 import { InvitationModel } from './invitation.mock';
 import { AssertionError } from 'assert';
+import { TInvitation } from './invitation.types';
 
 describe('InvitationService', () => {
   let service: InvitationService;
@@ -23,6 +24,7 @@ describe('InvitationService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(invitationModel).toBeDefined();
   });
 
   describe('sendInvite', () => {
@@ -50,6 +52,48 @@ describe('InvitationService', () => {
         } catch (e) {
           expect(e).not.toBeInstanceOf(AssertionError);
         }
+      });
+    });
+  });
+
+  describe('getInvitationsByUserId', () => {
+    describe('When invitations are found successfully', () => {
+      it('should return product invitations', async () => {
+        const exec = jest.fn(
+          () =>
+            [
+              {
+                accepted: false,
+                deleted: false,
+                rejected: false,
+                team: 'team',
+                user: 'user',
+              },
+            ] as TInvitation[],
+        );
+        const select = jest.fn(() => {
+          return { exec };
+        });
+        const populate = jest.fn(() => {
+          return { select };
+        });
+        const find = jest.fn(() => {
+          return { populate };
+        });
+
+        jest.spyOn(invitationModel, 'find').mockImplementation(find);
+
+        const invitations = await service.getInvitationsByUserId('userId');
+
+        expect(invitations).toEqual([
+          {
+            accepted: false,
+            deleted: false,
+            rejected: false,
+            team: 'team',
+            user: 'user',
+          },
+        ] as TInvitation[]);
       });
     });
   });
