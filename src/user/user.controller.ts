@@ -106,6 +106,7 @@ export class UserController {
     }
 
     return {
+      _id: user.id,
       username: user.username,
       email: user.email,
       firstName: user.firstName,

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TeamService } from './team.service';
 import { getModelToken } from '@nestjs/mongoose';
-import { Team, TeamPublicSelect } from './team.schema';
+import { Team, TeamDocument, TeamPublicSelect } from './team.schema';
 import { AuthModule } from '../auth/auth.module';
 import { forwardRef, InternalServerErrorException } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
@@ -349,6 +349,30 @@ describe('TeamService', () => {
         } catch (e) {
           expect(e).not.toBeInstanceOf(AssertionError);
         }
+      });
+    });
+  });
+
+  describe('getTeamById', () => {
+    describe('When team is found by that id', () => {
+      it('should respond with correct team', async () => {
+        jest
+          .spyOn(teamModel, 'findById')
+          .mockImplementation(async () => ({ id: 'teamId' } as TeamDocument));
+
+        const team = await service.getTeamById('teamId');
+
+        expect(team).toEqual({ id: 'teamId' });
+      });
+    });
+
+    describe('When team is not found by that id', () => {
+      it('should not respond with team', async () => {
+        jest.spyOn(teamModel, 'findById').mockImplementation(async () => null);
+
+        const team = await service.getTeamById('teamId');
+
+        expect(team).toEqual(null);
       });
     });
   });

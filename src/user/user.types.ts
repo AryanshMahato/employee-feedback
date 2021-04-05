@@ -24,6 +24,6 @@ export interface GenerateAccessTokenResponse {
 
 export type IUser = User;
 
-export type GetUserResponse = Omit<IUser, 'password'>;
+export type GetUserResponse = { _id: string } & Omit<IUser, 'password'>;
 
 export type GetUserMethods = 'username' | 'email';

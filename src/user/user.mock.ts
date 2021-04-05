@@ -15,6 +15,10 @@ export class UserModelMock {
   findByIdAndUpdate = (): unknown => {
     return;
   };
+
+  findById = (): unknown => {
+    return;
+  };
 }
 
 export class UserServiceMock {
@@ -47,6 +51,10 @@ export class UserServiceMock {
   signUp(_userData: Omit<SignUpRequest, 'confirmPassword'>): Promise<string> {
     return Promise.resolve('');
   }
+
+  getUserById = async (_id: string): Promise<UserDocument> => {
+    return Promise.resolve({} as UserDocument);
+  };
 }
 
 export const UserModuleMock = Test.createTestingModule({

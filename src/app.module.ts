@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { RedisModule } from './redis/redis.module';
 import { TeamModule } from './team/team.module';
+import { InvitationModule } from './invitation/invitation.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TeamModule } from './team/team.module';
     UserModule,
     RedisModule,
     TeamModule,
+    InvitationModule,
   ],
   controllers: [AppController],
   providers: [],

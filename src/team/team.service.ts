@@ -82,4 +82,8 @@ export class TeamService {
       description: updatedTeam.description,
     });
   };
+
+  getTeamById = async (id: string): Promise<TeamDocument> => {
+    return this.teamModel.findById(id);
+  };
 }

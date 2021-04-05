@@ -5,7 +5,7 @@ import * as mongoose from 'mongoose';
 
 export type UserDocument = User & Document;
 
-export const UserPublicSelect = 'firstName lastName username email';
+export const UserPublicSelect = '_id firstName lastName username email';
 
 @Schema({
   timestamps: true,
